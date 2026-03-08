@@ -30,40 +30,62 @@ export function AuthProvider({ children }) {
             return
         }
 
-        const buildUser = async (session) => {
-            let role = 'user';
+        const fetchProfile = async (sessionUser) => {
             try {
-                const { data } = await supabase.from('profiles').select('role').eq('id', session.user.id).single()
-                if (data) role = data.role
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', sessionUser.id)
+                    .maybeSingle()
+                return data?.role || 'user'
             } catch (err) {
-                console.error('Error fetching role', err)
-            }
-            return {
-                id: session.user.id,
-                email: session.user.email,
-                name: session.user.user_metadata?.name || session.user.email,
-                organization: session.user.user_metadata?.organization || '',
-                role
+                console.error('Error fetching role:', err)
+                return 'user'
             }
         }
 
-        supabase.auth.getSession().then(async ({ data: { session } }) => {
-            if (session) {
-                const u = await buildUser(session)
-                setUser(u)
-                localStorage.setItem('docsearch_token', session.access_token)
-                localStorage.setItem('docsearch_user', JSON.stringify(u))
+        const initializeAuth = async () => {
+            try {
+                const { data: { session } } = await supabase.auth.getSession()
+                if (session) {
+                    const role = await fetchProfile(session.user)
+                    const u = {
+                        id: session.user.id,
+                        email: session.user.email,
+                        name: session.user.user_metadata?.name || session.user.email,
+                        organization: session.user.user_metadata?.organization || '',
+                        role
+                    }
+                    setUser(u)
+                    localStorage.setItem('docsearch_token', session.access_token)
+                    localStorage.setItem('docsearch_user', JSON.stringify(u))
+                }
+            } catch (err) {
+                console.error('Auth initialization error:', err)
+            } finally {
+                setLoading(false)
             }
-            setLoading(false)
-        })
+        }
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        initializeAuth()
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (session) {
-                const u = await buildUser(session)
-                setUser(u)
-                localStorage.setItem('docsearch_token', session.access_token)
-                localStorage.setItem('docsearch_user', JSON.stringify(u))
-            } else {
+                // Se for LOGIN ou INITIAL_SESSION, atualizamos o perfil
+                if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+                    const role = await fetchProfile(session.user)
+                    const u = {
+                        id: session.user.id,
+                        email: session.user.email,
+                        name: session.user.user_metadata?.name || session.user.email,
+                        organization: session.user.user_metadata?.organization || '',
+                        role
+                    }
+                    setUser(u)
+                    localStorage.setItem('docsearch_token', session.access_token)
+                    localStorage.setItem('docsearch_user', JSON.stringify(u))
+                }
+            } else if (event === 'SIGNED_OUT') {
                 setUser(null)
                 localStorage.removeItem('docsearch_token')
                 localStorage.removeItem('docsearch_user')
