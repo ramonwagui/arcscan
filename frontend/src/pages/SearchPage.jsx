@@ -94,6 +94,7 @@ export default function SearchPage() {
                 category: filters.category || undefined,
                 dateFrom: filters.dateFrom || undefined,
                 dateTo: filters.dateTo || undefined,
+                semantic: semanticSearch,
             })
             setResults(data.results || [])
         } catch (err) {

@@ -164,10 +164,12 @@ export default function DocumentDetailPage() {
                         <div className="card p-0 overflow-hidden relative group">
                             {fileUrl ? (
                                 <>
-                                    {/* Marca d'água dinâmica (Phase 4) */}
-                                    <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden opacity-[0.03] select-none flex flex-wrap justify-around content-around rotate-[-30deg]">
+                                    {/* Marca d'água dinâmica (Phase 4) - Mais visível */}
+                                    <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden opacity-[0.08] select-none flex flex-wrap justify-around content-around rotate-[-30deg]">
                                         {Array(80).fill(0).map((_, i) => (
-                                            <span key={i} className="text-sm font-bold m-4 whitespace-nowrap">ARCSCAN - {localStorage.getItem('docsearch_user') ? JSON.parse(localStorage.getItem('docsearch_user')).email : 'CONFIDENCIAL'}</span>
+                                            <span key={i} className="text-xs font-bold m-4 whitespace-nowrap text-white">
+                                                ARCSCAN - {localStorage.getItem('docsearch_user') ? JSON.parse(localStorage.getItem('docsearch_user')).email : 'CONFIDENCIAL'}
+                                            </span>
                                         ))}
                                     </div>
 

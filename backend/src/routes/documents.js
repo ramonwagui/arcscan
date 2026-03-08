@@ -99,7 +99,7 @@ router.get('/:id/url', async (req, res, next) => {
 
         const url = await getSignedUrl(doc.file_path);
 
-        await auditService.log(req.user.id, 'FILE_VIEW', req.params.id, {}, req.user.email);
+        await auditService.log(req.user.id, 'FILE_VIEW', req.params.id, {}, req.user.email, req.ip);
 
         res.json({ url });
     } catch (err) {
@@ -123,7 +123,7 @@ router.post('/:id/chat', async (req, res, next) => {
 
         const answer = await aiService.askDocument(doc.title, doc.ocr_text || '', message.trim());
 
-        await auditService.log(req.user.id, 'IA_CHAT', req.params.id, { question: message.substring(0, 50) }, req.user.email);
+        await auditService.log(req.user.id, 'IA_CHAT', req.params.id, { question: message.substring(0, 50) }, req.user.email, req.ip);
 
         res.json({ answer });
     } catch (err) {
@@ -143,7 +143,7 @@ router.post('/:id/extract-fields', async (req, res, next) => {
 
         const fields = await aiService.extractFields(doc.category, doc.ocr_text);
 
-        await auditService.log(req.user.id, 'IA_EXTRACT_FIELDS', req.params.id, { category: doc.category }, req.user.email);
+        await auditService.log(req.user.id, 'IA_EXTRACT_FIELDS', req.params.id, { category: doc.category }, req.user.email, req.ip);
 
         res.json(fields);
     } catch (err) {
@@ -214,7 +214,7 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
             return res.status(400).json({ error: 'Nenhum arquivo enviado' });
         }
 
-        const { title, category = 'outros' } = req.body;
+        const { title, category = 'outros', expiresAt } = req.body;
 
         if (!title || title.trim().length < 2) {
             return res.status(400).json({ error: 'Título é obrigatório (mínimo 2 caracteres)' });
@@ -256,12 +256,13 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
             file_size: req.file.size,
             file_type: req.file.mimetype,
             category,
+            expires_at: expiresAt || null,
             status: 'processing',
             ocr_text: null,
         });
         docId = doc.id;
 
-        await auditService.log(req.user.id, 'UPLOAD', docId, { filename: doc.filename }, req.user.email);
+        await auditService.log(req.user.id, 'UPLOAD', docId, { filename: doc.filename }, req.user.email, req.ip);
 
         // Retornar imediatamente ao cliente
         res.status(201).json({
