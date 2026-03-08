@@ -12,6 +12,7 @@ const {
     getDocumentById,
     listDocuments,
     getDashboardStats,
+    getExpiringDocuments,
 } = require('../services/documentService');
 const aiService = require('../services/aiService');
 
@@ -28,6 +29,20 @@ router.get('/stats', async (req, res, next) => {
     try {
         const stats = await getDashboardStats(req.user.id);
         res.json(stats);
+    } catch (err) {
+        next(err);
+    }
+});
+
+/**
+ * GET /api/documents/expiring
+ * Retorna documentos próximos do vencimento
+ */
+router.get('/expiring', async (req, res, next) => {
+    try {
+        const days = req.query.days || 30;
+        const docs = await getExpiringDocuments(req.user.id, days);
+        res.json(docs);
     } catch (err) {
         next(err);
     }

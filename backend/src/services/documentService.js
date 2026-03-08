@@ -349,6 +349,33 @@ async function getDashboardStats(userId) {
     };
 }
 
+async function getExpiringDocuments(userId, days = 30) {
+    if (supabase.isMock) {
+        const threshold = new Date();
+        threshold.setDate(threshold.getDate() + days);
+        return mockDocuments.filter(d =>
+            d.user_id === userId &&
+            d.expires_at &&
+            new Date(d.expires_at) <= threshold &&
+            new Date(d.expires_at) >= new Date()
+        );
+    }
+
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + parseInt(days));
+
+    const { data, error } = await supabase.client
+        .from('documents')
+        .select('*')
+        .eq('user_id', userId)
+        .gte('expires_at', new Date().toISOString())
+        .lte('expires_at', maxDate.toISOString())
+        .order('expires_at', { ascending: true });
+
+    if (error) throw new Error('Erro ao buscar documentos expirando: ' + error.message);
+    return data;
+}
+
 module.exports = {
     createDocument,
     updateDocument,
@@ -358,4 +385,5 @@ module.exports = {
     searchDocuments,
     getDashboardStats,
     extractSnippet,
+    getExpiringDocuments,
 };

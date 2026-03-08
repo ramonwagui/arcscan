@@ -47,6 +47,9 @@ export const documentsApi = {
     getSignedUrl: (id) =>
         api.get(`/api/documents/${id}/url`).then(r => r.data),
 
+    getExpiring: (days = 30) =>
+        api.get(`/api/documents/expiring`, { params: { days } }).then(r => r.data),
+
     upload: (formData, onProgress) =>
         api.post('/api/documents/upload', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
