@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
     ArrowLeft, Download, FileText, Calendar, Tag, HardDrive,
     Eye, Cpu, Copy, CheckCircle, AlertCircle, ExternalLink, Sparkles,
-    Shield, History, User, TrendingUp
+    Shield, History, User, TrendingUp, Info
 } from 'lucide-react'
 import { documentsApi, categoriesApi } from '../lib/api'
 import { getCategoryInfo, formatDate, formatFileSize, getFileIcon } from '../lib/utils'
