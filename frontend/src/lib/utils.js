@@ -14,24 +14,28 @@ export const getCategoryInfo = (value, customList = null) => {
 
     if (cat) {
         if (cat.slug && cat.color && !cat.bg) {
-            // Se for do DB, tentamos quebrar as classes salvos no campo "color"
-            const classes = cat.color.split(' ');
+            const classes = (cat.color || '').split(' ');
             return {
                 ...cat,
-                label: cat.name,
-                bg: classes.find(c => c.startsWith('bg-')) || '',
-                color: classes.find(c => c.startsWith('text-')) || '',
-                border: classes.find(c => c.startsWith('border-')) || '',
-                icon: '📁'
+                label: cat.name || cat.label || 'Sem Nome',
+                bg: classes.find(c => c.startsWith('bg-')) || 'bg-slate-700/10',
+                color: classes.find(c => c.startsWith('text-')) || 'text-slate-400',
+                border: classes.find(c => c.startsWith('border-')) || 'border-slate-700/30',
+                icon: cat.icon || '📁'
             };
         }
         return cat;
     }
 
-    // Fallback
+    // Fallback seguro em caso de valor nulo ou indefinido
+    const safeValue = value || 'outros';
+    const label = (typeof safeValue === 'string' && safeValue.length > 0)
+        ? safeValue.charAt(0).toUpperCase() + safeValue.slice(1).replace(/_/g, ' ')
+        : 'Outros';
+
     return {
-        value: value,
-        label: value.charAt(0).toUpperCase() + value.slice(1).replace(/_/g, ' '),
+        value: safeValue,
+        label: label,
         color: 'text-slate-400',
         bg: 'bg-slate-400/10',
         border: 'border-slate-500/30',

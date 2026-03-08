@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FileText, Upload, Search, TrendingUp, Clock, FolderOpen, ChevronRight, Zap, CheckCircle } from 'lucide-react'
-import { documentsApi } from '../lib/api'
+import { documentsApi, categoriesApi } from '../lib/api'
 import { CATEGORIES, getCategoryInfo, formatDate } from '../lib/utils'
 import { useAuth } from '../context/AuthContext'
 
@@ -25,8 +25,8 @@ function StatCard({ icon: Icon, label, value, sub, color, to }) {
     return to ? <Link to={to}>{content}</Link> : content
 }
 
-function CategoryBar({ category, count, total }) {
-    const info = getCategoryInfo(category)
+function CategoryBar({ category, count, total, customList }) {
+    const info = getCategoryInfo(category, customList)
     const pct = total ? Math.round((count / total) * 100) : 0
 
     return (
@@ -53,15 +53,18 @@ export default function DashboardPage() {
     const { user } = useAuth()
     const [stats, setStats] = useState(null)
     const [recentDocs, setRecentDocs] = useState([])
+    const [dbCategories, setDbCategories] = useState([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         Promise.all([
             documentsApi.getStats(),
             documentsApi.list({ limit: 5 }),
-        ]).then(([statsData, listData]) => {
+            categoriesApi.list(),
+        ]).then(([statsData, listData, catsData]) => {
             setStats(statsData)
             setRecentDocs(listData.documents || [])
+            setDbCategories(catsData)
         }).catch(console.error).finally(() => setLoading(false))
     }, [])
 
@@ -175,11 +178,11 @@ export default function DashboardPage() {
                             <p className="text-slate-500 text-sm text-center py-8">Nenhum documento ainda</p>
                         ) : (
                             <div className="space-y-3">
-                                {CATEGORIES.map(cat => {
-                                    const count = byCategory[cat.value] || 0
+                                {dbCategories.map(cat => {
+                                    const count = byCategory[cat.slug] || 0
                                     if (count === 0) return null
                                     return (
-                                        <CategoryBar key={cat.value} category={cat.value} count={count} total={totalDocs} />
+                                        <CategoryBar key={cat.slug} category={cat.slug} count={count} total={totalDocs} customList={dbCategories} />
                                     )
                                 })}
                             </div>
@@ -214,7 +217,7 @@ export default function DashboardPage() {
                     ) : (
                         <div className="space-y-2">
                             {recentDocs.map(doc => {
-                                const cat = getCategoryInfo(doc.category)
+                                const cat = getCategoryInfo(doc.category, dbCategories)
                                 return (
                                     <Link
                                         key={doc.id}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { FileText, Filter, Search, Trash2, Eye, ChevronRight, SlidersHorizontal, X } from 'lucide-react'
-import { documentsApi } from '../lib/api'
+import { documentsApi, categoriesApi } from '../lib/api'
 import { CATEGORIES, getCategoryInfo, formatDate, formatFileSize, getFileIcon } from '../lib/utils'
 import toast from 'react-hot-toast'
 

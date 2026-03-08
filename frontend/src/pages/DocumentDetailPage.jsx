@@ -5,7 +5,7 @@ import {
     Eye, Cpu, Copy, CheckCircle, AlertCircle, ExternalLink, Sparkles,
     Shield, History, User
 } from 'lucide-react'
-import { documentsApi } from '../lib/api'
+import { documentsApi, categoriesApi } from '../lib/api'
 import { getCategoryInfo, formatDate, formatFileSize, getFileIcon } from '../lib/utils'
 import toast from 'react-hot-toast'
 
@@ -31,6 +31,7 @@ export default function DocumentDetailPage() {
     const [chatLoading, setChatLoading] = useState(false)
     const [messages, setMessages] = useState([]) // { role: 'user'|'ai', content: string }
     const [auditLogs, setAuditLogs] = useState([])
+    const [dbCategories, setDbCategories] = useState([])
 
     useEffect(() => {
         const load = async () => {
@@ -51,6 +52,11 @@ export default function DocumentDetailPage() {
                 } catch {
                     console.log('Audit logs not supported')
                 }
+                // Carregar categorias
+                try {
+                    const cats = await categoriesApi.list()
+                    setDbCategories(cats)
+                } catch { }
             } catch {
                 toast.error('Documento não encontrado')
                 navigate('/documents')
@@ -80,8 +86,7 @@ export default function DocumentDetailPage() {
     }
 
     if (!doc) return null
-
-    const cat = getCategoryInfo(doc.category)
+    const cat = getCategoryInfo(doc.category, dbCategories)
 
     return (
         <div className="max-w-4xl mx-auto space-y-5 animate-slide-up">
