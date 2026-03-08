@@ -8,8 +8,36 @@ export const CATEGORIES = [
     { value: 'outros', label: 'Outros', color: 'text-slate-400', bg: 'bg-slate-400/10', border: 'border-slate-500/30', icon: '📁' },
 ]
 
-export const getCategoryInfo = (value) =>
-    CATEGORIES.find(c => c.value === value) || CATEGORIES[CATEGORIES.length - 1]
+export const getCategoryInfo = (value, customList = null) => {
+    const list = customList || CATEGORIES;
+    const cat = list.find(c => (c.value === value || c.slug === value));
+
+    if (cat) {
+        if (cat.slug && cat.color && !cat.bg) {
+            // Se for do DB, tentamos quebrar as classes salvos no campo "color"
+            const classes = cat.color.split(' ');
+            return {
+                ...cat,
+                label: cat.name,
+                bg: classes.find(c => c.startsWith('bg-')) || '',
+                color: classes.find(c => c.startsWith('text-')) || '',
+                border: classes.find(c => c.startsWith('border-')) || '',
+                icon: '📁'
+            };
+        }
+        return cat;
+    }
+
+    // Fallback
+    return {
+        value: value,
+        label: value.charAt(0).toUpperCase() + value.slice(1).replace(/_/g, ' '),
+        color: 'text-slate-400',
+        bg: 'bg-slate-400/10',
+        border: 'border-slate-500/30',
+        icon: '📁'
+    };
+}
 
 export const formatFileSize = (bytes) => {
     if (!bytes) return '—'

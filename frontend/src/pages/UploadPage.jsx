@@ -1,8 +1,7 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Upload, FileText, X, CheckCircle, AlertCircle, Info } from 'lucide-react'
-import { documentsApi } from '../lib/api'
-import { CATEGORIES } from '../lib/utils'
+import { Upload, FileText, X, CheckCircle, AlertCircle, Info, Tag } from 'lucide-react'
+import { documentsApi, categoriesApi } from '../lib/api'
 import toast from 'react-hot-toast'
 
 const ACCEPTED = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
@@ -37,10 +36,15 @@ export default function UploadPage() {
     const [file, setFile] = useState(null)
     const [title, setTitle] = useState('')
     const [category, setCategory] = useState('outros')
+    const [dbCategories, setDbCategories] = useState([])
     const [dragOver, setDragOver] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [progress, setProgress] = useState(0)
     const [error, setError] = useState('')
+
+    useEffect(() => {
+        categoriesApi.list().then(setDbCategories).catch(() => { })
+    }, [])
 
     const validateFile = (f) => {
         if (!ACCEPTED.includes(f.type)) {
@@ -175,18 +179,18 @@ export default function UploadPage() {
                 <div>
                     <label className="text-sm font-medium text-slate-300 mb-1.5 block">Categoria</label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        {CATEGORIES.map(cat => (
+                        {dbCategories.map(cat => (
                             <button
-                                key={cat.value}
+                                key={cat.slug}
                                 type="button"
-                                onClick={() => setCategory(cat.value)}
-                                className={`p-3 rounded-xl border text-left transition-all duration-200 ${category === cat.value
-                                        ? `${cat.bg} ${cat.border} border ${cat.color}`
-                                        : 'bg-surface-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                                onClick={() => setCategory(cat.slug)}
+                                className={`p-3 rounded-xl border text-left transition-all duration-200 ${category === cat.slug
+                                    ? `${cat.color} border-current ring-1 ring-current bg-surface-800`
+                                    : 'bg-surface-800 border-slate-700 text-slate-400 hover:border-slate-600'
                                     }`}
                             >
-                                <div className="text-lg mb-1">{cat.icon}</div>
-                                <div className="text-xs font-medium">{cat.label}</div>
+                                <div className="text-lg mb-1"><Tag size={18} className="opacity-70" /></div>
+                                <div className="text-xs font-medium truncate">{cat.name}</div>
                             </button>
                         ))}
                     </div>

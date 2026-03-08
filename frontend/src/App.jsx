@@ -8,6 +8,7 @@ import DocumentsPage from './pages/DocumentsPage'
 import SearchPage from './pages/SearchPage'
 import UploadPage from './pages/UploadPage'
 import DocumentDetailPage from './pages/DocumentDetailPage'
+import AdminPage from './pages/AdminPage'
 
 function PrivateRoute({ children }) {
     const { user, loading } = useAuth()
@@ -48,6 +49,7 @@ export default function App() {
                     <Route path="documents/:id" element={<DocumentDetailPage />} />
                     <Route path="search" element={<SearchPage />} />
                     <Route path="upload" element={<UploadPage />} />
+                    <Route path="admin" element={<AdminPage />} />
                 </Route>
 
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />

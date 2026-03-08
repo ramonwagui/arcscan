@@ -8,6 +8,8 @@ const rateLimit = require('express-rate-limit');
 const documentsRouter = require('./routes/documents');
 const searchRouter = require('./routes/search');
 const healthRouter = require('./routes/health');
+const categoriesRouter = require('./routes/categories');
+const usersRouter = require('./routes/users');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -68,6 +70,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/api/health', healthRouter);
 app.use('/api/documents', documentsRouter);
 app.use('/api/search', searchRouter);
+app.use('/api/categories', categoriesRouter);
+app.use('/api/users', usersRouter);
 
 // 404
 app.use((req, res) => {

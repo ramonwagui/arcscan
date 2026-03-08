@@ -81,6 +81,11 @@ export default function DocumentsPage() {
     const [loading, setLoading] = useState(true)
     const [showFilters, setShowFilters] = useState(false)
     const [filters, setFilters] = useState({ category: '', dateFrom: '', dateTo: '' })
+    const [dbCategories, setDbCategories] = useState([])
+
+    useEffect(() => {
+        categoriesApi.list().then(setDbCategories).catch(() => { })
+    }, [])
 
     const loadDocs = useCallback(async () => {
         setLoading(true)
@@ -159,7 +164,7 @@ export default function DocumentsPage() {
                                 onChange={e => setFilters(f => ({ ...f, category: e.target.value }))}
                             >
                                 <option value="">Todas</option>
-                                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                                {dbCategories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
                             </select>
                         </div>
                         <div>

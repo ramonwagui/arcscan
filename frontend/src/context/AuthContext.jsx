@@ -19,7 +19,6 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         if (isMockMode) {
-            // Mock: verificar se já há sessão salva
             const saved = localStorage.getItem('docsearch_user')
             if (saved) {
                 try {
@@ -31,15 +30,26 @@ export function AuthProvider({ children }) {
             return
         }
 
-        // Supabase: verificar sessão existente
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        const buildUser = async (session) => {
+            let role = 'user';
+            try {
+                const { data } = await supabase.from('profiles').select('role').eq('id', session.user.id).single()
+                if (data) role = data.role
+            } catch (err) {
+                console.error('Error fetching role', err)
+            }
+            return {
+                id: session.user.id,
+                email: session.user.email,
+                name: session.user.user_metadata?.name || session.user.email,
+                organization: session.user.user_metadata?.organization || '',
+                role
+            }
+        }
+
+        supabase.auth.getSession().then(async ({ data: { session } }) => {
             if (session) {
-                const u = {
-                    id: session.user.id,
-                    email: session.user.email,
-                    name: session.user.user_metadata?.name || session.user.email,
-                    organization: session.user.user_metadata?.organization || '',
-                }
+                const u = await buildUser(session)
                 setUser(u)
                 localStorage.setItem('docsearch_token', session.access_token)
                 localStorage.setItem('docsearch_user', JSON.stringify(u))
@@ -47,15 +57,9 @@ export function AuthProvider({ children }) {
             setLoading(false)
         })
 
-        // Listener para mudanças de auth
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             if (session) {
-                const u = {
-                    id: session.user.id,
-                    email: session.user.email,
-                    name: session.user.user_metadata?.name || session.user.email,
-                    organization: session.user.user_metadata?.organization || '',
-                }
+                const u = await buildUser(session)
                 setUser(u)
                 localStorage.setItem('docsearch_token', session.access_token)
                 localStorage.setItem('docsearch_user', JSON.stringify(u))

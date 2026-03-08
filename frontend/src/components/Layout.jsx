@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import {
     LayoutDashboard, FileText, Search, Upload, LogOut,
-    Menu, X, Building2, ChevronRight, Bell
+    Menu, X, Building2, ChevronRight, Bell, Shield
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
@@ -88,6 +88,21 @@ export default function Layout() {
                             <span>{label}</span>
                         </NavLink>
                     ))}
+                    {user?.role === 'superadmin' && (
+                        <>
+                            <div className="h-px bg-slate-800/60 my-2 mx-3" />
+                            <NavLink
+                                to="/admin"
+                                onClick={() => setSidebarOpen(false)}
+                                className={({ isActive }) =>
+                                    `sidebar-link text-primary-400 hover:text-primary-300 ${isActive ? 'active bg-primary-500/10' : ''}`
+                                }
+                            >
+                                <Shield size={18} />
+                                <span>Painel Admin</span>
+                            </NavLink>
+                        </>
+                    )}
                 </nav>
 
                 {/* User info */}
@@ -98,7 +113,10 @@ export default function Layout() {
                         </div>
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-slate-200 truncate">{user?.name || 'Usuário'}</p>
-                            <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                            <div className="flex items-center gap-1">
+                                <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                                {user?.role === 'superadmin' && <Shield size={10} className="text-primary-500 flex-shrink-0" />}
+                            </div>
                         </div>
                     </div>
                     <button

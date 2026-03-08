@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Search, Filter, FileText, Clock, X, ChevronRight, Sparkles } from 'lucide-react'
-import { searchApi } from '../lib/api'
+import { searchApi, categoriesApi } from '../lib/api'
 import { CATEGORIES, getCategoryInfo, formatDate, highlightText } from '../lib/utils'
 import { Link, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
@@ -13,7 +13,7 @@ function ResultCard({ doc, query }) {
     return (
         <Link to={`/documents/${doc.id}`} className="card-hover group block">
             <div className="flex items-start gap-4">
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${cat.bg} ${cat.border} border text-xl`}>
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${cat.bg} ${cat.color} ${cat.border} border text-xl`}>
                     {cat.icon}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -59,9 +59,11 @@ export default function SearchPage() {
     const [loading, setLoading] = useState(false)
     const [searched, setSearched] = useState(false)
     const [showFilters, setShowFilters] = useState(false)
+    const [dbCategories, setDbCategories] = useState([])
     const inputRef = useRef(null)
 
     useEffect(() => {
+        categoriesApi.list().then(setDbCategories).catch(() => { })
         inputRef.current?.focus()
         const q = searchParams.get('q')
         if (q) performSearch(q)
@@ -171,7 +173,7 @@ export default function SearchPage() {
                             <label className="text-xs font-medium text-slate-400 mb-1.5 block">Categoria</label>
                             <select className="select text-sm" value={filters.category} onChange={e => setFilters(f => ({ ...f, category: e.target.value }))}>
                                 <option value="">Todas</option>
-                                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                                {dbCategories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
                             </select>
                         </div>
                         <div>

@@ -19,7 +19,8 @@ async function authMiddleware(req, res, next) {
             req.user = {
                 id: 'mock-user-id',
                 email: 'demo@docsearch.local',
-                name: 'Usuário Demo'
+                name: 'Usuário Demo',
+                role: 'superadmin' // Modo mock = admin total
             };
             return next();
         }
@@ -30,7 +31,18 @@ async function authMiddleware(req, res, next) {
             return res.status(401).json({ error: 'Token inválido ou expirado' });
         }
 
-        req.user = user;
+        // Buscar o perfil do usuário (para ter o cargo/role)
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+        req.user = {
+            ...user,
+            role: profile ? profile.role : 'user'
+        };
+
         next();
     } catch (err) {
         console.error('Auth middleware error:', err);

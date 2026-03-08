@@ -77,4 +77,40 @@ export const searchApi = {
         api.get('/api/search', { params: { q, ...filters } }).then(r => r.data),
 }
 
+// ──────────────────────────────────────────
+// Categories
+// ──────────────────────────────────────────
+
+export const categoriesApi = {
+    list: () =>
+        api.get('/api/categories').then(r => r.data),
+
+    create: (data) =>
+        api.post('/api/categories', data).then(r => r.data),
+
+    update: (id, data) =>
+        api.put(`/api/categories/${id}`, data).then(r => r.data),
+
+    delete: (id) =>
+        api.delete(`/api/categories/${id}`).then(r => r.data),
+}
+
+// ──────────────────────────────────────────
+// Users
+// ──────────────────────────────────────────
+
+export const usersApi = {
+    me: () =>
+        api.get('/api/users/me').then(r => r.data),
+
+    list: () =>
+        api.get('/api/users').then(r => r.data),
+
+    updateRole: (id, role) =>
+        api.patch(`/api/users/${id}/role`, { role }).then(r => r.data),
+
+    delete: (id) =>
+        api.delete(`/api/users/${id}`).then(r => r.data),
+}
+
 export default api
