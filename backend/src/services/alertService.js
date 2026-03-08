@@ -11,16 +11,18 @@ class AlertService {
         // Em um sistema real, percorreríamos todos os usuários. 
         // Aqui simulamos a verificação para o usuário mock.
         try {
-            const userId = 'mock-user-id'; // Em produção usaríamos listagem de usuários
-            const docs = await getExpiringDocuments(userId, 30);
+            if (!supabase) {
+                const userId = 'mock-user-id'; // Apenas para debug local sem banco
+                const docs = await getExpiringDocuments(userId, 30);
 
-            if (docs.length > 0) {
-                console.log(`[ALERTAS] Encontrados ${docs.length} documentos expirando para ${userId}`);
-                // Aqui entraria o código do Nodemailer para enviar o e-mail
-                // Por simplicidade, exibimos no console.
-                docs.forEach(doc => {
-                    console.log(`[NOTIFICAR] Documento "${doc.title}" vence em: ${doc.expires_at}`);
-                });
+                if (docs.length > 0) {
+                    console.log(`[ALERTAS] Encontrados ${docs.length} documentos expirando para ${userId}`);
+                    docs.forEach(doc => {
+                        console.log(`[NOTIFICAR] Documento "${doc.title}" vence em: ${doc.expires_at}`);
+                    });
+                }
+            } else {
+                console.log('[ALERTAS] Serviço em standby. Requer configuração de Cron para usuários reais.');
             }
         } catch (err) {
             console.error('[ALERTAS ERROR]', err.message);

@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    /* Reduz a base do tailwind (rem) para dar um aspecto mais afastado/premium */
+    font-size: 85%;
+  }
+
   * {
     box-sizing: border-box;
   }

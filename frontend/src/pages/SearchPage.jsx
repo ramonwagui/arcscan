@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Search, Filter, FileText, Clock, X, ChevronRight, Sparkles } from 'lucide-react'
+import { Search, Filter, FileText, Clock, X, ChevronRight, Sparkles, Cpu } from 'lucide-react'
 import { searchApi, categoriesApi } from '../lib/api'
 import { CATEGORIES, getCategoryInfo, formatDate, highlightText } from '../lib/utils'
 import { Link, useSearchParams } from 'react-router-dom'

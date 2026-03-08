@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Upload, FileText, X, CheckCircle, AlertCircle, Info, Tag } from 'lucide-react'
+import { Upload, FileText, X, CheckCircle, AlertCircle, Info, Tag, TrendingUp } from 'lucide-react'
 import { documentsApi, categoriesApi } from '../lib/api'
 import toast from 'react-hot-toast'
 
