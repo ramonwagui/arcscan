@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FileText, Upload, Search, TrendingUp, Clock, FolderOpen, ChevronRight, Zap, CheckCircle } from 'lucide-react'
+import { FileText, Upload, Search, TrendingUp, Clock, FolderOpen, ChevronRight, Zap, CheckCircle, Shield } from 'lucide-react'
 import { documentsApi, categoriesApi } from '../lib/api'
 import { CATEGORIES, getCategoryInfo, formatDate } from '../lib/utils'
 import { useAuth } from '../context/AuthContext'
