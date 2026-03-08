@@ -223,7 +223,11 @@ export default function DocumentDetailPage() {
                                     {Object.entries(aiFields).map(([key, val]) => (
                                         <div key={key} className="p-3 rounded-xl bg-surface-900/50 border border-slate-700/50">
                                             <p className="text-[10px] uppercase font-bold text-slate-500 mb-1">{key.replace(/_/g, ' ')}</p>
-                                            <p className="text-sm text-slate-200">{val || '—'}</p>
+                                            <p className="text-sm text-slate-200">
+                                                {typeof val === 'object' && val !== null
+                                                    ? JSON.stringify(val).replace(/["{}]/g, '').replace(/,/g, ', ')
+                                                    : (val || '—')}
+                                            </p>
                                         </div>
                                     ))}
                                 </div>
