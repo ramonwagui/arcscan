@@ -106,6 +106,9 @@ export const usersApi = {
     list: () =>
         api.get('/api/users').then(r => r.data),
 
+    invite: (email) =>
+        api.post('/api/users', { email }).then(r => r.data),
+
     updateRole: (id, role) =>
         api.patch(`/api/users/${id}/role`, { role }).then(r => r.data),
 

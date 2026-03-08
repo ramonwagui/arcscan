@@ -34,6 +34,33 @@ router.get('/', async (req, res, next) => {
     }
 });
 
+// POST /api/users - Convida um novo usuário por e-mail
+router.post('/', async (req, res, next) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ error: 'E-mail é obrigatório' });
+        }
+
+        if (!supabase) {
+            return res.status(201).json({ message: 'Convite simulado enviado para ' + email });
+        }
+
+        // Envia o convite via Supabase Auth Admin
+        const { data, error } = await supabase.auth.admin.inviteUserByEmail(email);
+
+        if (error) throw error;
+
+        res.status(201).json({
+            message: 'Convite enviado com sucesso para ' + email,
+            user: data.user
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+
 // PATCH /api/users/:id/role - Atualiza cargo (role) do usuário
 router.patch('/:id/role', async (req, res, next) => {
     try {

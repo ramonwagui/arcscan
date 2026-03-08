@@ -200,10 +200,42 @@ export default function AdminPage() {
 
                 {activeTab === 'users' && (
                     <div className="space-y-6">
-                        <div className="flex justify-between items-center">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <h3 className="text-lg font-semibold text-white">Gerenciar Usuários e Acessos</h3>
+
+                            <form
+                                onSubmit={async (e) => {
+                                    e.preventDefault();
+                                    const email = e.target.email.value;
+                                    if (!email) return;
+                                    const btn = e.target.querySelector('button');
+                                    btn.disabled = true;
+                                    try {
+                                        await usersApi.invite(email);
+                                        toast.success('Convite enviado para ' + email);
+                                        e.target.reset();
+                                        loadData();
+                                    } catch (err) {
+                                        toast.error(err.response?.data?.error || 'Erro ao enviar convite');
+                                    } finally {
+                                        btn.disabled = false;
+                                    }
+                                }}
+                                className="flex gap-2"
+                            >
+                                <input
+                                    name="email"
+                                    type="email"
+                                    required
+                                    placeholder="E-mail do novo usuário"
+                                    className="input text-sm py-2 px-3 min-w-[220px]"
+                                />
+                                <button type="submit" className="btn-primary text-xs py-2 h-10 px-4 whitespace-nowrap">
+                                    <Plus size={14} /> Convidar Usuário
+                                </button>
+                            </form>
                         </div>
-                        <p className="text-sm text-slate-400 mb-4">Apenas superadmins podem ver esta área. Você pode promover usuários comuns ou excluir contas do sistema.</p>
+                        <p className="text-sm text-slate-400 mb-4">Apenas superadmins podem ver esta área. O convidar enviará um e-mail para o usuário criar a senha.</p>
 
                         {loading ? (
                             <div className="py-8 text-center text-slate-500"><div className="w-8 h-8 spinner mx-auto" /></div>

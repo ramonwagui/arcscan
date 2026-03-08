@@ -30,17 +30,26 @@ export function AuthProvider({ children }) {
             return
         }
 
-        const fetchProfile = async (sessionUser) => {
+        const fetchAndStoreProfile = async (sessionUser) => {
             try {
-                const { data, error } = await supabase
+                const { data } = await supabase
                     .from('profiles')
                     .select('role')
                     .eq('id', sessionUser.id)
                     .maybeSingle()
-                return data?.role || 'user'
+
+                const role = data?.role || 'user'
+                const fullUser = {
+                    id: sessionUser.id,
+                    email: sessionUser.email,
+                    name: sessionUser.user_metadata?.name || sessionUser.email,
+                    organization: sessionUser.user_metadata?.organization || '',
+                    role
+                }
+                setUser(fullUser)
+                localStorage.setItem('docsearch_user', JSON.stringify(fullUser))
             } catch (err) {
-                console.error('Error fetching role:', err)
-                return 'user'
+                console.error('Background role fetch failed:', err)
             }
         }
 
@@ -48,17 +57,20 @@ export function AuthProvider({ children }) {
             try {
                 const { data: { session } } = await supabase.auth.getSession()
                 if (session) {
-                    const role = await fetchProfile(session.user)
-                    const u = {
+                    // Define o usuário básico imediatamente para liberar o Loading
+                    const basicUser = {
                         id: session.user.id,
                         email: session.user.email,
                         name: session.user.user_metadata?.name || session.user.email,
                         organization: session.user.user_metadata?.organization || '',
-                        role
+                        role: 'user' // Default até carregar o real
                     }
-                    setUser(u)
+                    setUser(basicUser)
                     localStorage.setItem('docsearch_token', session.access_token)
-                    localStorage.setItem('docsearch_user', JSON.stringify(u))
+                    localStorage.setItem('docsearch_user', JSON.stringify(basicUser))
+
+                    // Busca o cargo real em segundo plano
+                    fetchAndStoreProfile(session.user)
                 }
             } catch (err) {
                 console.error('Auth initialization error:', err)
@@ -69,21 +81,20 @@ export function AuthProvider({ children }) {
 
         initializeAuth()
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (session) {
-                // Se for LOGIN ou INITIAL_SESSION, atualizamos o perfil
                 if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-                    const role = await fetchProfile(session.user)
-                    const u = {
+                    const basicUser = {
                         id: session.user.id,
                         email: session.user.email,
                         name: session.user.user_metadata?.name || session.user.email,
                         organization: session.user.user_metadata?.organization || '',
-                        role
+                        role: 'user'
                     }
-                    setUser(u)
+                    setUser(basicUser)
                     localStorage.setItem('docsearch_token', session.access_token)
-                    localStorage.setItem('docsearch_user', JSON.stringify(u))
+                    localStorage.setItem('docsearch_user', JSON.stringify(basicUser))
+                    fetchAndStoreProfile(session.user)
                 }
             } else if (event === 'SIGNED_OUT') {
                 setUser(null)
