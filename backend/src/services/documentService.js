@@ -357,9 +357,9 @@ async function getDashboardStats(userId) {
 }
 
 async function getExpiringDocuments(userId, days = 30) {
-    if (supabase.isMock) {
+    if (!supabase) {
         const threshold = new Date();
-        threshold.setDate(threshold.getDate() + days);
+        threshold.setDate(threshold.getDate() + parseInt(days));
         return mockDocuments.filter(d =>
             d.user_id === userId &&
             d.expires_at &&
@@ -371,7 +371,7 @@ async function getExpiringDocuments(userId, days = 30) {
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + parseInt(days));
 
-    const { data, error } = await supabase.client
+    const { data, error } = await supabase
         .from('documents')
         .select('*')
         .eq('user_id', userId)
