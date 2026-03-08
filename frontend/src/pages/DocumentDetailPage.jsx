@@ -347,7 +347,7 @@ export default function DocumentDetailPage() {
                                             <div className="flex items-center gap-2 text-xs text-slate-300">
                                                 <User size={12} className="text-slate-500" />
                                                 <span className="text-slate-400">Usuário:</span>
-                                                <span className="font-medium">{log.userId === 'mock-user-id' ? 'Você (Admin)' : log.userId}</span>
+                                                <span className="font-medium">{log.user_name || log.userName || (log.userId === 'mock-user-id' ? 'Você (Admin)' : log.userId)}</span>
                                             </div>
 
                                             {log.details && Object.keys(log.details).length > 0 && (

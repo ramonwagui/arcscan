@@ -84,7 +84,7 @@ router.get('/:id/url', async (req, res, next) => {
 
         const url = await getSignedUrl(doc.file_path);
 
-        await auditService.log(req.user.id, 'FILE_VIEW', req.params.id);
+        await auditService.log(req.user.id, 'FILE_VIEW', req.params.id, {}, req.user.email);
 
         res.json({ url });
     } catch (err) {
@@ -108,7 +108,7 @@ router.post('/:id/chat', async (req, res, next) => {
 
         const answer = await aiService.askDocument(doc.title, doc.ocr_text || '', message.trim());
 
-        await auditService.log(req.user.id, 'IA_CHAT', req.params.id, { question: message.substring(0, 50) });
+        await auditService.log(req.user.id, 'IA_CHAT', req.params.id, { question: message.substring(0, 50) }, req.user.email);
 
         res.json({ answer });
     } catch (err) {
@@ -138,7 +138,7 @@ router.patch('/:id/status', async (req, res, next) => {
         await auditService.log(req.user.id, 'STATUS_CHANGE', req.params.id, {
             newStatus: status,
             notes: notes ? 'Com notas' : 'Sem notas'
-        });
+        }, req.user.email);
 
         res.json(updatedDoc);
     } catch (err) {
@@ -206,7 +206,7 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
         });
         docId = doc.id;
 
-        await auditService.log(req.user.id, 'UPLOAD', docId, { filename: doc.filename });
+        await auditService.log(req.user.id, 'UPLOAD', docId, { filename: doc.filename }, req.user.email);
 
         // Retornar imediatamente ao cliente
         res.status(201).json({
@@ -250,7 +250,7 @@ router.delete('/:id', async (req, res, next) => {
         await deleteFile(doc.file_path);
         await deleteDocument(req.params.id, req.user.id);
 
-        await auditService.log(req.user.id, 'DELETE', req.params.id, { title: doc.title });
+        await auditService.log(req.user.id, 'DELETE', req.params.id, { title: doc.title }, req.user.email);
 
         res.json({ message: 'Documento removido com sucesso' });
     } catch (err) {

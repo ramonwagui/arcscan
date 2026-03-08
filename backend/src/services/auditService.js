@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
+const supabase = require('../config/supabase');
 
 /**
  * Serviço de Auditoria (Compliance)
@@ -6,26 +7,18 @@ const { v4: uuidv4 } = require('uuid');
  */
 class AuditService {
     constructor() {
-        this.logs = [
+        this.mockLogs = [
             {
                 id: 'audit-1',
                 timestamp: '2024-01-15T10:30:00Z',
-                userId: 'mock-user-id',
+                user_id: 'mock-user-id',
+                user_name: 'Usuário Demo',
                 action: 'UPLOAD',
-                resourceId: 'mock-doc-1',
+                resource_id: 'mock-doc-1',
                 details: { filename: 'contrato_servicos_2024.pdf' },
                 ip: '127.0.0.1'
-            },
-            {
-                id: 'audit-2',
-                timestamp: '2024-01-15T10:40:00Z',
-                userId: 'mock-user-id',
-                action: 'STATUS_CHANGE',
-                resourceId: 'mock-doc-1',
-                details: { newStatus: 'approved', notes: 'Aprovado pelo financeiro' },
-                ip: '127.0.0.1'
             }
-        ]; // No mock, guardamos em memória
+        ];
     }
 
     /**
@@ -33,31 +26,65 @@ class AuditService {
      * @param {string} userId - ID do usuário
      * @param {string} action - 'UPLOAD', 'DOWNLOAD', 'VIEW', 'DELETE', 'STATUS_CHANGE', 'CHAT'
      * @param {string} resourceId - ID do documento/recurso
-     * @param {object} details - Informações extras (ex: status antigo vs novo)
+     * @param {object} details - Informações extras
+     * @param {string} userName - Nome ou email do usuário para exibição
      */
-    async log(userId, action, resourceId, details = {}) {
+    async log(userId, action, resourceId, details = {}, userName = null) {
         const entry = {
             id: uuidv4(),
             timestamp: new Date().toISOString(),
-            userId,
+            user_id: userId,
+            user_name: userName || userId, // Fallback para o ID se não houver nome
             action,
-            resourceId,
+            resource_id: resourceId,
             details,
-            ip: '127.0.0.1' // Em produção, pegaríamos o IP real
+            ip: '127.0.0.1'
         };
 
-        this.logs.unshift(entry);
-        console.log(`[AUDIT] ${action} por ${userId} no recurso ${resourceId}`);
+        if (!supabase) {
+            this.mockLogs.unshift(entry);
+            console.log(`[AUDIT-MOCK] ${action} por ${userName || userId}`);
+            return entry;
+        }
 
-        // Em produção aqui salvaria na tabela 'audit_logs' do Supabase
-        return entry;
+        try {
+            const { data, error } = await supabase
+                .from('audit_logs')
+                .insert([entry])
+                .select()
+                .single();
+
+            if (error) throw error;
+            return data;
+        } catch (err) {
+            console.error('[AUDIT-ERROR] Falha ao salvar log:', err.message);
+            return entry;
+        }
     }
 
     async getLogs(resourceId = null) {
-        if (resourceId) {
-            return this.logs.filter(l => l.resourceId === resourceId);
+        if (!supabase) {
+            if (resourceId) {
+                return this.mockLogs.filter(l => l.resource_id === resourceId);
+            }
+            return this.mockLogs;
         }
-        return this.logs;
+
+        let query = supabase
+            .from('audit_logs')
+            .select('*')
+            .order('timestamp', { ascending: false });
+
+        if (resourceId) {
+            query = query.eq('resource_id', resourceId);
+        }
+
+        const { data, error } = await query;
+        if (error) {
+            console.error('[AUDIT-ERROR] Falha ao buscar logs:', error.message);
+            return [];
+        }
+        return data || [];
     }
 }
 
