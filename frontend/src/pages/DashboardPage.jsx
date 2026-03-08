@@ -54,18 +54,30 @@ export default function DashboardPage() {
     const [stats, setStats] = useState(null)
     const [recentDocs, setRecentDocs] = useState([])
     const [dbCategories, setDbCategories] = useState([])
+    const [expiringDocs, setExpiringDocs] = useState([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         Promise.all([
-            documentsApi.getStats(),
-            documentsApi.list({ limit: 5 }),
-            categoriesApi.list(),
-        ]).then(([statsData, listData, catsData]) => {
-            setStats(statsData)
-            setRecentDocs(listData.documents || [])
-            setDbCategories(catsData)
-        }).catch(console.error).finally(() => setLoading(false))
+            documentsApi.getStats().catch(() => ({ totalDocuments: 0, byCategory: {}, byStatus: {}, uploadedThisMonth: 0 })),
+            documentsApi.list({ limit: 5 }).catch(() => ({ documents: [] })),
+            categoriesApi.list().catch(() => []),
+            documentsApi.getExpiring(30).catch(() => [])
+        ]).then(([statsData, listData, catsData, expiringData]) => {
+            setStats(statsData || { totalDocuments: 0, byCategory: {}, byStatus: {}, uploadedThisMonth: 0 })
+            setRecentDocs(Array.isArray(listData?.documents) ? listData.documents : (Array.isArray(listData) ? listData : []))
+            setDbCategories(Array.isArray(catsData) ? catsData : [])
+            setExpiringDocs(Array.isArray(expiringData) ? expiringData : [])
+        }).catch(err => {
+            console.error('[DASHBOARD ERROR]', err)
+            setStats({ totalDocuments: 0, byCategory: {}, byStatus: {}, uploadedThisMonth: 0 })
+            setRecentDocs([])
+            setDbCategories([])
+            setExpiringDocs([])
+        }).finally(() => {
+            console.log('[DEBUG] Dashboard loading finished.');
+            setLoading(false);
+        })
     }, [])
 
     if (loading) {
@@ -241,6 +253,35 @@ export default function DashboardPage() {
                         </div>
                     )}
                 </div>
+
+                {/* Expiring soon */}
+                {expiringDocs.length > 0 && (
+                    <div className="card lg:col-span-1 border-amber-500/20 bg-amber-500/5">
+                        <h2 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
+                            <TrendingUp size={16} className="text-amber-400" />
+                            Vencimentos Próximos
+                        </h2>
+                        <div className="space-y-3">
+                            {expiringDocs.map(doc => {
+                                const expDate = new Date(doc.expires_at)
+                                const days = Math.ceil((expDate - new Date()) / (1000 * 60 * 60 * 24))
+                                return (
+                                    <Link key={doc.id} to={`/documents/${doc.id}`} className="flex items-center gap-3 group">
+                                        <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                                            <TrendingUp size={14} className="text-amber-500" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-slate-200 truncate group-hover:text-amber-300">{doc.title}</p>
+                                            <p className="text-[10px] text-amber-500/80">
+                                                {days < 0 ? `Vencido há ${Math.abs(days)} dias` : `Vence em ${days} dias (${expDate.toLocaleDateString()})`}
+                                            </p>
+                                        </div>
+                                    </Link>
+                                )
+                            })}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Quick actions */}

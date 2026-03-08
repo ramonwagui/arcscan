@@ -52,7 +52,9 @@ export const formatFileSize = (bytes) => {
 
 export const formatDate = (dateStr) => {
     if (!dateStr) return '—'
-    return new Date(dateStr).toLocaleDateString('pt-BR', {
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime())) return 'Data inválida'
+    return date.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
