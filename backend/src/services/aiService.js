@@ -27,9 +27,8 @@ class AIService {
         if (!this.client) this._updateConfig();
 
         if (!this.client) {
-            // Mock mode se não houver chave real (gsk_...)
             console.log(`[GROQ MOCK] Respondendo simuladamente para: ${docTitle}`);
-            return `Esta é uma resposta simulada (chave GROQ_API_KEY não configurada no .env).\n\nPara usar a inteligência real do Groq, pegue uma chave gratuita em console.groq.com e adicione no arquivo .env do backend.\n\nConteúdo lido: ${docContent?.length || 0} caracteres do documento "${docTitle}".`;
+            return `Esta é uma resposta simulada (chave GROQ_API_KEY não configurada no .env).\n\nConteúdo lido: ${docContent?.length || 0} caracteres do documento "${docTitle}".`;
         }
 
         try {
@@ -37,40 +36,104 @@ class AIService {
                 messages: [
                     {
                         role: "system",
-                        content: `Você é um assistente de gestão documental do sistema Arcscan.
-                        Responda em PORTUGUÊS BRASILEIRO.
-                        Use apenas os fatos presentes no documento fornecido.
-                        Se não souber a resposta, diga honestamente que a informação não foi encontrada.`
+                        content: `Você é um assistente de gestão documental do sistema Arcscan. Respondas em PORTUGUÊS BRASILEIRO. Use apenas os fatos presentes no documento fornecido.`
                     },
                     {
                         role: "user",
-                        content: `DOCUMENTO: ${docTitle}
-                        CONTEÚDO EXTRAÍDO:
-                        ---
-                        ${docContent || '(Sem texto disponível)'}
-                        ---
-
-                        PERGUNTA: ${userQuestion}`
+                        content: `DOCUMENTO: ${docTitle}\nCONTEÚDO: ${docContent || '(Vazio)'}\n\nPERGUNTA: ${userQuestion}`
                     }
                 ],
-                model: "llama-3.3-70b-versatile", // Modelo de alta performance e gratuito no Groq
-                temperature: 0.1, // Mais preciso
+                model: "llama-3.3-70b-versatile",
+                temperature: 0.1,
             });
 
-            const text = completion.choices[0]?.message?.content;
-            if (!text) throw new Error('O Groq não gerou uma resposta.');
-            return text;
+            return completion.choices[0]?.message?.content || 'Sem resposta.';
         } catch (error) {
-            console.error('[GROQ SERVICE ERROR]', error.status || 'UNKNOWN', error.message);
+            console.error('[GROQ ERROR]', error.message);
+            return 'Erro ao processar pergunta via IA.';
+        }
+    }
 
-            if (error.status === 401) {
-                return "Erro: Sua chave GROQ_API_KEY é inválida. Verifique em console.groq.com";
-            }
-            if (error.status === 429) {
-                return "Erro: Limite de taxa do Groq atingido. Tente novamente em 1 minuto.";
-            }
+    async extractFields(category, ocrText) {
+        if (!this.client) this._updateConfig();
+        if (!this.client) return { status: 'mock', data: { info: 'Modo demonstração ativo' } };
 
-            throw new Error('Falha técnica ao falar com a IA via Groq.');
+        const prompts = {
+            notas_fiscais: "Extraia CNPJ emitente, valor total e data de emissão.",
+            contratos: "Extraia as partes (contratante/contratada), objeto, valor global e vigência.",
+            convenios: "Extraia concedente, convenente, valor e prazo.",
+            prontuarios: "Extraia nome do paciente, médico, data e diagnóstico/queixa.",
+            outros: "Extraia os 3 pontos mais importantes do texto."
+        };
+
+        try {
+            const completion = await this.client.chat.completions.create({
+                messages: [
+                    {
+                        role: "system",
+                        content: "Você é um extrator de dados JSON. Retorne APENAS um objeto JSON puro, sem markdown, sem explicações."
+                    },
+                    {
+                        role: "user",
+                        content: `Categoria: ${category}\nTexto: ${ocrText}\n\n${prompts[category] || prompts.outros}`
+                    }
+                ],
+                model: "llama-3.3-70b-versatile",
+                response_format: { type: "json_object" },
+                temperature: 0,
+            });
+
+            return JSON.parse(completion.choices[0]?.message?.content);
+        } catch (error) {
+            console.error('[GROQ EXTRACT ERROR]', error.message);
+            return { error: 'Falha na extração de campos' };
+        }
+    }
+
+    async classifyDocument(ocrText) {
+        if (!this.client) this._updateConfig();
+        if (!this.client) return { category: 'outros', confidence: 0 };
+
+        try {
+            const completion = await this.client.chat.completions.create({
+                messages: [
+                    {
+                        role: "system",
+                        content: "Classifique o documento em: contratos, notas_fiscais, oficios, convenios, projetos, prontuarios, outros. Retorne apenas JSON: { category, reason }."
+                    },
+                    {
+                        role: "user",
+                        content: `Texto do documento: ${ocrText.substring(0, 3000)}`
+                    }
+                ],
+                model: "llama-3.3-70b-versatile",
+                response_format: { type: "json_object" },
+                temperature: 0,
+            });
+
+            return JSON.parse(completion.choices[0]?.message?.content);
+        } catch (error) {
+            console.error('[GROQ CLASSIFY ERROR]', error.message);
+            return { category: 'outros', reason: 'Erro na classificação' };
+        }
+    }
+
+    async generateEmbedding(text) {
+        if (!process.env.OPENAI_API_KEY) {
+            // Mock: Retorna um vetor de 1536 dimensões (padrão pgvector)
+            return Array(1536).fill(0).map(() => Math.random() * 2 - 1);
+        }
+
+        try {
+            const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+            const response = await openai.embeddings.create({
+                model: "text-embedding-3-small",
+                input: text.substring(0, 8000),
+            });
+            return response.data[0].embedding;
+        } catch (err) {
+            console.error('[EMBEDDING ERROR]', err.message);
+            return Array(1536).fill(0);
         }
     }
 }

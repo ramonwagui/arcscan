@@ -4,7 +4,7 @@ const router = express.Router();
 const authMiddleware = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const { extractText } = require('../services/ocrService');
-const { uploadFile, deleteFile, getSignedUrl } = require('../services/storageService');
+const { uploadFile, deleteFile, getSignedUrl, generateThumbnail } = require('../services/storageService');
 const {
     createDocument,
     updateDocument,
@@ -132,28 +132,55 @@ router.post('/:id/chat', async (req, res, next) => {
 });
 
 /**
+ * POST /api/documents/:id/extract-fields
+ * Usa IA para extrair campos-chave baseado na categoria
+ */
+router.post('/:id/extract-fields', async (req, res, next) => {
+    try {
+        const doc = await getDocumentById(req.params.id, req.user.id);
+        if (!doc) return res.status(404).json({ error: 'Documento não encontrado' });
+        if (!doc.ocr_text) return res.status(400).json({ error: 'OCR ainda não processado' });
+
+        const fields = await aiService.extractFields(doc.category, doc.ocr_text);
+
+        await auditService.log(req.user.id, 'IA_EXTRACT_FIELDS', req.params.id, { category: doc.category }, req.user.email);
+
+        res.json(fields);
+    } catch (err) {
+        next(err);
+    }
+});
+
+/**
  * PATCH /api/documents/:id/status
- * Atualiza o status de aprovação e notas
+ * Atualiza o status de aprovação, notas e categoria opcionalmente
  */
 router.patch('/:id/status', async (req, res, next) => {
     try {
-        const { status, notes } = req.body;
+        const { status, notes, category } = req.body;
 
         const VALID_STATUSES = ['pending', 'reviewing', 'approved', 'rejected'];
         if (!VALID_STATUSES.includes(status)) {
             return res.status(400).json({ error: 'Status inválido' });
         }
 
-        const updatedDoc = await updateDocument(req.params.id, req.user.id, {
+        const updates = {
             approval_status: status,
             approval_notes: notes || null,
             reviewed_at: new Date().toISOString()
-        });
+        };
+
+        if (category && VALID_CATEGORIES.includes(category)) {
+            updates.category = category;
+        }
+
+        const updatedDoc = await updateDocument(req.params.id, req.user.id, updates);
 
         await auditService.log(req.user.id, 'STATUS_CHANGE', req.params.id, {
             newStatus: status,
-            notes: notes ? 'Com notas' : 'Sem notas'
-        }, req.user.email);
+            notes: notes ? 'Com notas' : 'Sem notas',
+            categoryUpdated: !!category
+        }, req.user.email, req.ip);
 
         res.json(updatedDoc);
     } catch (err) {
@@ -207,12 +234,25 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
         );
         filePath = storagePath;
 
-        // 2. Criar registro inicial no banco
+        // 2. Gerar Thumbnail (opcional)
+        let thumbPath = null;
+        try {
+            const thumbBuffer = await generateThumbnail(req.file.buffer, req.file.mimetype);
+            if (thumbBuffer) {
+                const { path: tp } = await uploadFile(thumbBuffer, 'image/webp', req.user.id, `thumb_${req.file.originalname}.webp`);
+                thumbPath = tp;
+            }
+        } catch (err) {
+            console.error('[THUMBNAIL] Falha silênciosa:', err.message);
+        }
+
+        // 3. Criar registro inicial no banco
         const doc = await createDocument({
             user_id: req.user.id,
             title: title.trim(),
             filename: req.file.originalname,
             file_path: storagePath,
+            thumbnail_path: thumbPath,
             file_size: req.file.size,
             file_type: req.file.mimetype,
             category,
@@ -233,11 +273,20 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
         (async () => {
             try {
                 const text = await extractText(req.file.buffer, req.file.mimetype, req.file.originalname);
+
+                // 3. Classificação automática via IA
+                const classification = await aiService.classifyDocument(text);
+
+                // 4. Gerar Embeddings (Opcional - Busca Semântica)
+                const embedding = await aiService.generateEmbedding(text);
+
                 await updateDocument(docId, req.user.id, {
                     ocr_text: text,
+                    ai_category_suggestion: classification?.category || 'outros',
+                    embedding: embedding,
                     status: 'completed',
                 });
-                console.log(`[OCR] Documento ${docId} processado com sucesso.`);
+                console.log(`[OCR/IA] Documento ${docId} processado e vetorizado.`);
             } catch (ocrErr) {
                 console.error(`[OCR] Erro no documento ${docId}:`, ocrErr.message);
                 await updateDocument(docId, req.user.id, { status: 'failed' }).catch(() => { });
@@ -265,7 +314,7 @@ router.delete('/:id', async (req, res, next) => {
         await deleteFile(doc.file_path);
         await deleteDocument(req.params.id, req.user.id);
 
-        await auditService.log(req.user.id, 'DELETE', req.params.id, { title: doc.title }, req.user.email);
+        await auditService.log(req.user.id, 'DELETE', req.params.id, { title: doc.title }, req.user.email, req.ip);
 
         res.json({ message: 'Documento removido com sucesso' });
     } catch (err) {

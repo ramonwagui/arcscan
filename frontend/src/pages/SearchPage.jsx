@@ -13,8 +13,18 @@ function ResultCard({ doc, query }) {
     return (
         <Link to={`/documents/${doc.id}`} className="card-hover group block">
             <div className="flex items-start gap-4">
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${cat.bg} ${cat.color} ${cat.border} border text-xl`}>
-                    {cat.icon}
+                <div className="relative w-11 h-11 flex-shrink-0 group-hover:scale-110 transition-transform">
+                    {doc.thumbnail_path ? (
+                        <img
+                            src={`/mock-storage/${doc.thumbnail_path}`}
+                            alt=""
+                            className={`w-11 h-11 rounded-xl object-cover border ${cat.border}`}
+                        />
+                    ) : (
+                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${cat.bg} ${cat.color} ${cat.border} border text-xl`}>
+                            {cat.icon}
+                        </div>
+                    )}
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
@@ -59,6 +69,7 @@ export default function SearchPage() {
     const [loading, setLoading] = useState(false)
     const [searched, setSearched] = useState(false)
     const [showFilters, setShowFilters] = useState(false)
+    const [semanticSearch, setSemanticSearch] = useState(false)
     const [dbCategories, setDbCategories] = useState([])
     const inputRef = useRef(null)
 
@@ -159,11 +170,22 @@ export default function SearchPage() {
                         Filtros avançados
                         {hasFilters && <span className="w-1.5 h-1.5 rounded-full bg-primary-400" />}
                     </button>
-                    {hasFilters && (
-                        <button onClick={() => setFilters({ category: '', dateFrom: '', dateTo: '' })} className="text-xs text-slate-500 hover:text-slate-300 flex items-center gap-1">
-                            <X size={11} />Limpar filtros
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setSemanticSearch(!semanticSearch)}
+                            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-semibold transition-all ${semanticSearch
+                                ? 'bg-primary-600/10 border-primary-500/40 text-primary-400'
+                                : 'bg-surface-800 border-slate-700 text-slate-500 hover:border-slate-600'}`}
+                        >
+                            <Sparkles size={12} />
+                            {semanticSearch ? 'Semantic ON' : 'Basic Search'}
                         </button>
-                    )}
+                        {hasFilters && (
+                            <button onClick={() => setFilters({ category: '', dateFrom: '', dateTo: '' })} className="text-xs text-slate-500 hover:text-slate-300 flex items-center gap-1">
+                                <X size={11} />Limpar filtros
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Filters */}
@@ -189,74 +211,78 @@ export default function SearchPage() {
             </div>
 
             {/* Examples (before search) */}
-            {!searched && (
-                <div className="animate-fade-in">
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                        <Sparkles size={12} className="text-primary-400" />
-                        Exemplos de busca
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                        {SEARCH_EXAMPLES.map(ex => (
-                            <button
-                                key={ex}
-                                onClick={() => { setQuery(ex); performSearch(ex) }}
-                                className="px-3 py-1.5 rounded-lg text-sm text-slate-400 hover:text-primary-300 bg-surface-800 hover:bg-primary-600/10 border border-slate-700 hover:border-primary-500/40 transition-all"
-                            >
-                                {ex}
-                            </button>
-                        ))}
-                    </div>
+            {
+                !searched && (
+                    <div className="animate-fade-in">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <Sparkles size={12} className="text-primary-400" />
+                            Exemplos de busca
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                            {SEARCH_EXAMPLES.map(ex => (
+                                <button
+                                    key={ex}
+                                    onClick={() => { setQuery(ex); performSearch(ex) }}
+                                    className="px-3 py-1.5 rounded-lg text-sm text-slate-400 hover:text-primary-300 bg-surface-800 hover:bg-primary-600/10 border border-slate-700 hover:border-primary-500/40 transition-all"
+                                >
+                                    {ex}
+                                </button>
+                            ))}
+                        </div>
 
-                    <div className="mt-6 card bg-surface-800/40">
-                        <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-primary-600/20 flex items-center justify-center flex-shrink-0">
-                                <Sparkles size={14} className="text-primary-400" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-semibold text-slate-300">Busca no conteúdo do texto</p>
-                                <p className="text-xs text-slate-500 mt-0.5">
-                                    O OCR extrai o texto de PDFs e imagens automaticamente. Você pode buscar por qualquer palavra presente nos documentos, mesmo que seja uma imagem escaneada.
-                                </p>
+                        <div className="mt-6 card bg-surface-800/40">
+                            <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-primary-600/20 flex items-center justify-center flex-shrink-0">
+                                    <Sparkles size={14} className="text-primary-400" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-semibold text-slate-300">Busca no conteúdo do texto</p>
+                                    <p className="text-xs text-slate-500 mt-0.5">
+                                        O OCR extrai o texto de PDFs e imagens automaticamente. Você pode buscar por qualquer palavra presente nos documentos, mesmo que seja uma imagem escaneada.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Results */}
-            {searched && (
-                <div className="animate-fade-in">
-                    {loading ? (
-                        <div className="space-y-3">
-                            {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-28 rounded-2xl" />)}
-                        </div>
-                    ) : results && results.length === 0 ? (
-                        <div className="text-center py-12">
-                            <div className="w-14 h-14 rounded-2xl bg-surface-800 flex items-center justify-center mx-auto mb-4 border border-slate-700">
-                                <Search size={22} className="text-slate-600" />
+            {
+                searched && (
+                    <div className="animate-fade-in">
+                        {loading ? (
+                            <div className="space-y-3">
+                                {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-28 rounded-2xl" />)}
                             </div>
-                            <p className="text-slate-300 font-semibold">Nenhum resultado encontrado</p>
-                            <p className="text-slate-500 text-sm mt-1">
-                                Tente outros termos ou verifique se o OCR foi concluído
-                            </p>
-                        </div>
-                    ) : (
-                        <>
-                            <div className="flex items-center justify-between mb-3">
-                                <p className="text-sm text-slate-400">
-                                    <span className="text-white font-semibold">{results?.length}</span> resultado{results?.length !== 1 ? 's' : ''} para{' '}
-                                    <span className="text-primary-400 font-medium">"{query}"</span>
+                        ) : results && results.length === 0 ? (
+                            <div className="text-center py-12">
+                                <div className="w-14 h-14 rounded-2xl bg-surface-800 flex items-center justify-center mx-auto mb-4 border border-slate-700">
+                                    <Search size={22} className="text-slate-600" />
+                                </div>
+                                <p className="text-slate-300 font-semibold">Nenhum resultado encontrado</p>
+                                <p className="text-slate-500 text-sm mt-1">
+                                    Tente outros termos ou verifique se o OCR foi concluído
                                 </p>
                             </div>
-                            <div className="space-y-3">
-                                {results?.map(doc => (
-                                    <ResultCard key={doc.id} doc={doc} query={query} />
-                                ))}
-                            </div>
-                        </>
-                    )}
-                </div>
-            )}
-        </div>
+                        ) : (
+                            <>
+                                <div className="flex items-center justify-between mb-3">
+                                    <p className="text-sm text-slate-400">
+                                        <span className="text-white font-semibold">{results?.length}</span> resultado{results?.length !== 1 ? 's' : ''} para{' '}
+                                        <span className="text-primary-400 font-medium">"{query}"</span>
+                                    </p>
+                                </div>
+                                <div className="space-y-3">
+                                    {results?.map(doc => (
+                                        <ResultCard key={doc.id} doc={doc} query={query} />
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )
+            }
+        </div >
     )
 }

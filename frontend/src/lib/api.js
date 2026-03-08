@@ -69,6 +69,9 @@ export const documentsApi = {
 
     getAudit: (id) =>
         api.get(`/api/documents/${id}/audit`).then(r => r.data),
+
+    extractFields: (id) =>
+        api.post(`/api/documents/${id}/extract-fields`).then(r => r.data),
 }
 
 // ──────────────────────────────────────────

@@ -82,4 +82,20 @@ function getExtFromMime(mime) {
     return map[mime] || '';
 }
 
-module.exports = { uploadFile, deleteFile, getSignedUrl };
+const sharp = require('sharp');
+
+async function generateThumbnail(buffer, mimetype) {
+    if (!mimetype.startsWith('image/')) return null; // Por enquanto focado em imagens
+
+    try {
+        return await sharp(buffer)
+            .resize(320, 240, { fit: 'inside', withoutEnlargement: true })
+            .webp()
+            .toBuffer();
+    } catch (err) {
+        console.error('[THUMBNAIL ERROR]', err.message);
+        return null;
+    }
+}
+
+module.exports = { uploadFile, deleteFile, getSignedUrl, generateThumbnail };

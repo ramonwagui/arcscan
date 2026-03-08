@@ -32,6 +32,8 @@ export default function DocumentDetailPage() {
     const [messages, setMessages] = useState([]) // { role: 'user'|'ai', content: string }
     const [auditLogs, setAuditLogs] = useState([])
     const [dbCategories, setDbCategories] = useState([])
+    const [aiFields, setAiFields] = useState(null)
+    const [extracting, setExtracting] = useState(false)
 
     useEffect(() => {
         const load = async () => {
@@ -115,6 +117,26 @@ export default function DocumentDetailPage() {
                         )}
                     </div>
                     <h1 className="text-xl font-bold text-white leading-snug">{doc.title}</h1>
+
+                    {doc.ai_category_suggestion && doc.ai_category_suggestion !== doc.category && (
+                        <div className="mt-2 flex items-center gap-2 p-2 rounded-lg bg-primary-600/10 border border-primary-500/20 text-[10px] text-primary-300">
+                            <Sparkles size={12} />
+                            A IA sugere que este documento é da categoria <b>{getCategoryInfo(doc.ai_category_suggestion, dbCategories).label}</b>.
+                            <button
+                                onClick={async () => {
+                                    try {
+                                        const updated = await documentsApi.updateStatus(doc.id, doc.approval_status, doc.approval_notes, doc.ai_category_suggestion);
+                                        // Nota: updateStatus no backend precisa aceitar categoria opcional. Vou ajustar.
+                                        setDoc(prev => ({ ...prev, category: doc.ai_category_suggestion }));
+                                        toast.success('Categoria atualizada pela sugestão da IA');
+                                    } catch { toast.error('Erro ao atualizar categoria'); }
+                                }}
+                                className="ml-auto underline font-bold"
+                            >
+                                Alterar agora
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -122,55 +144,91 @@ export default function DocumentDetailPage() {
                 {/* Main content */}
                 <div className="lg:col-span-2 space-y-4">
                     {/* Tabs */}
-                    <div className="flex gap-1 p-1 bg-surface-800 rounded-xl w-fit">
-                        {['preview', 'text', 'chat', 'history'].map(tab => (
+                    <div className="flex gap-1 p-1 bg-surface-800 rounded-xl w-fit overflow-x-auto">
+                        {['preview', 'text', 'ai_fields', 'chat', 'history'].map(tab => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === tab
+                                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${activeTab === tab
                                     ? 'bg-primary-600 text-white shadow-sm'
                                     : 'text-slate-400 hover:text-slate-200'
                                     }`}
                             >
-                                {tab === 'preview' ? '👁️ Visualizar' : tab === 'text' ? '📝 Texto OCR' : tab === 'chat' ? '🤖 Chat IA' : '🛡️ Histórico'}
+                                {tab === 'preview' ? '👁️ Preview' : tab === 'text' ? '📝 Texto' : tab === 'ai_fields' ? '✨ Campos IA' : tab === 'chat' ? '🤖 Chat' : '🛡️ Logs'}
                             </button>
                         ))}
                     </div>
 
-                    {/* Preview tab */}
+                    {/* Preview tab with Watermark (Phase 4) */}
                     {activeTab === 'preview' && (
-                        <div className="card p-0 overflow-hidden">
+                        <div className="card p-0 overflow-hidden relative group">
                             {fileUrl ? (
-                                doc.file_type === 'application/pdf' ? (
-                                    <iframe
-                                        src={fileUrl}
-                                        className="w-full h-[600px] rounded-2xl"
-                                        title={doc.title}
-                                    />
-                                ) : (
-                                    <div className="flex items-center justify-center p-6 bg-surface-900/50">
-                                        <img
-                                            src={fileUrl}
-                                            alt={doc.title}
-                                            className="max-w-full max-h-[560px] rounded-xl object-contain"
-                                        />
+                                <>
+                                    {/* Marca d'água dinâmica (Phase 4) */}
+                                    <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden opacity-[0.03] select-none flex flex-wrap justify-around content-around rotate-[-30deg]">
+                                        {Array(80).fill(0).map((_, i) => (
+                                            <span key={i} className="text-sm font-bold m-4 whitespace-nowrap">ARCSCAN - {localStorage.getItem('docsearch_user') ? JSON.parse(localStorage.getItem('docsearch_user')).email : 'CONFIDENCIAL'}</span>
+                                        ))}
                                     </div>
-                                )
+
+                                    {doc.file_type === 'application/pdf' ? (
+                                        <iframe src={fileUrl} className="w-full h-[600px] rounded-2xl relative z-0" title={doc.title} />
+                                    ) : (
+                                        <div className="flex items-center justify-center p-6 bg-surface-900/50">
+                                            <img src={fileUrl} alt={doc.title} className="max-w-full max-h-[560px] rounded-xl object-contain" />
+                                        </div>
+                                    )}
+                                </>
                             ) : (
                                 <div className="flex flex-col items-center justify-center py-16 text-center">
                                     <div className="w-16 h-16 rounded-2xl bg-surface-700 flex items-center justify-center mb-4 border border-slate-700">
                                         <span className="text-3xl">{getFileIcon(doc.file_type)}</span>
                                     </div>
                                     <p className="text-slate-400 font-medium">Visualização não disponível</p>
-                                    <p className="text-slate-600 text-sm mt-1">
-                                        Configure o Supabase Storage para visualizar arquivos
-                                    </p>
-                                    {fileUrl && (
-                                        <a href={fileUrl} target="_blank" rel="noreferrer" className="btn-secondary mt-4 text-sm">
-                                            <ExternalLink size={14} />
-                                            Abrir em nova aba
-                                        </a>
-                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* AI Fields tab (Phase 1) */}
+                    {activeTab === 'ai_fields' && (
+                        <div className="card space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                                    <Sparkles size={16} className="text-primary-400" />
+                                    Dados Extraídos pela IA
+                                </h3>
+                                <button
+                                    onClick={async () => {
+                                        setExtracting(true);
+                                        try {
+                                            const fields = await documentsApi.extractFields(doc.id);
+                                            setAiFields(fields);
+                                            toast.success('Informações extraídas com sucesso!');
+                                        } catch { toast.error('Erro na extração de campos'); }
+                                        finally { setExtracting(false); }
+                                    }}
+                                    disabled={extracting || !doc.ocr_text}
+                                    className="btn-primary text-xs py-1.5 px-3"
+                                >
+                                    {extracting ? <div className="w-3 h-3 spinner" /> : <Cpu size={12} />}
+                                    {extracting ? 'Extraindo...' : 'Extrair Campos'}
+                                </button>
+                            </div>
+
+                            {aiFields ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 animate-fade-in">
+                                    {Object.entries(aiFields).map(([key, val]) => (
+                                        <div key={key} className="p-3 rounded-xl bg-surface-900/50 border border-slate-700/50">
+                                            <p className="text-[10px] uppercase font-bold text-slate-500 mb-1">{key.replace(/_/g, ' ')}</p>
+                                            <p className="text-sm text-slate-200">{val || '—'}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="py-12 text-center text-slate-500 border-2 border-dashed border-slate-800 rounded-2xl">
+                                    <Cpu size={32} className="mx-auto mb-3 opacity-20" />
+                                    <p className="text-sm">Clique em "Extrair Campos" para que a IA analise<br />os dados essenciais deste documento.</p>
                                 </div>
                             )}
                         </div>
@@ -459,6 +517,7 @@ export default function DocumentDetailPage() {
                             <DetailRow icon={Tag} label="Categoria" value={cat.label} />
                             <DetailRow icon={HardDrive} label="Tamanho" value={formatFileSize(doc.file_size)} />
                             <DetailRow icon={FileText} label="Tipo" value={doc.file_type?.split('/')[1]?.toUpperCase() || '—'} />
+                            <DetailRow icon={Calendar} label="Vencimento" value={formatDate(doc.expires_at) || '—'} />
                             <DetailRow icon={Calendar} label="Upload" value={formatDate(doc.created_at)} />
                             <DetailRow icon={Calendar} label="Atualizado" value={formatDate(doc.updated_at)} />
                         </div>

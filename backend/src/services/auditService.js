@@ -29,21 +29,24 @@ class AuditService {
      * @param {object} details - Informações extras
      * @param {string} userName - Nome ou email do usuário para exibição
      */
-    async log(userId, action, resourceId, details = {}, userName = null) {
+    /**
+     * Registra uma ação com IP real
+     */
+    async log(userId, action, resourceId, details = {}, userName = null, ip = '127.0.0.1') {
         const entry = {
             id: uuidv4(),
             timestamp: new Date().toISOString(),
             user_id: userId,
-            user_name: userName || userId, // Fallback para o ID se não houver nome
+            user_name: userName || userId,
             action,
             resource_id: resourceId,
             details,
-            ip: '127.0.0.1'
+            ip: ip.replace('::ffff:', '') // Limpeza básica de IPv6 para IPv4
         };
 
         if (!supabase) {
             this.mockLogs.unshift(entry);
-            console.log(`[AUDIT-MOCK] ${action} por ${userName || userId}`);
+            console.log(`[AUDIT-MOCK] ${action} por ${userName || userId} [IP: ${entry.ip}]`);
             return entry;
         }
 

@@ -86,9 +86,21 @@ app.use((err, req, res, next) => {
   });
 });
 
+const alertService = require('./services/alertService');
+
 app.listen(PORT, () => {
   console.log(`🚀 DocSearch API rodando em http://localhost:${PORT}`);
   console.log(`📄 Ambiente: ${process.env.NODE_ENV}`);
+
+  // Job de Alertas: verifica a cada 24h
+  setInterval(() => {
+    alertService.checkAndSendAlerts().catch(() => { });
+  }, 24 * 60 * 60 * 1000);
+
+  // Executar uma vez no boot
+  setTimeout(() => {
+    alertService.checkAndSendAlerts().catch(() => { });
+  }, 5000);
 });
 
 module.exports = app;

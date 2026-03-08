@@ -103,6 +103,9 @@ async function createDocument(data) {
             id: uuidv4(),
             approval_status: 'pending',
             approval_notes: null,
+            ai_category_suggestion: null,
+            expires_at: null,
+            embedding: null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };
@@ -131,9 +134,13 @@ async function updateDocument(id, userId, updates) {
         return mockDocuments[idx];
     }
 
+    // Garante que campos nulos de IA ou Vencimento sejam aceitos
+    const cleanedUpdates = { ...updates };
+    if (cleanedUpdates.updated_at === undefined) cleanedUpdates.updated_at = new Date().toISOString();
+
     const { data: doc, error } = await supabase
         .from('documents')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update(cleanedUpdates)
         .eq('id', id)
         .eq('user_id', userId)
         .select()

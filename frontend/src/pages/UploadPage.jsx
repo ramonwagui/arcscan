@@ -41,6 +41,7 @@ export default function UploadPage() {
     const [uploading, setUploading] = useState(false)
     const [progress, setProgress] = useState(0)
     const [error, setError] = useState('')
+    const [expiresAt, setExpiresAt] = useState('')
 
     useEffect(() => {
         categoriesApi.list().then(setDbCategories).catch(() => { })
@@ -86,6 +87,7 @@ export default function UploadPage() {
         formData.append('file', file)
         formData.append('title', title.trim())
         formData.append('category', category)
+        if (expiresAt) formData.append('expiresAt', expiresAt)
 
         try {
             await documentsApi.upload(formData, (pct) => setProgress(pct))
@@ -173,6 +175,20 @@ export default function UploadPage() {
                         onChange={e => setTitle(e.target.value)}
                         required
                     />
+                </div>
+
+                {/* Expires At (Fase 2) */}
+                <div>
+                    <label className="text-sm font-medium text-slate-300 mb-1.5 block">
+                        Data de Vencimento (opcional)
+                    </label>
+                    <input
+                        type="date"
+                        className="input"
+                        value={expiresAt}
+                        onChange={e => setExpiresAt(e.target.value)}
+                    />
+                    <p className="text-[10px] text-slate-500 mt-1">O sistema enviará alertas 30 dias antes desta data.</p>
                 </div>
 
                 {/* Category */}
