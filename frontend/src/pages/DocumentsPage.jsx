@@ -5,8 +5,8 @@ import { documentsApi, categoriesApi } from '../lib/api'
 import { CATEGORIES, getCategoryInfo, formatDate, formatFileSize, getFileIcon } from '../lib/utils'
 import toast from 'react-hot-toast'
 
-function DocumentCard({ doc, onDelete }) {
-    const cat = getCategoryInfo(doc.category)
+function DocumentCard({ doc, onDelete, dbCategories }) {
+    const cat = getCategoryInfo(doc.category, dbCategories)
     const [deleting, setDeleting] = useState(false)
 
     const handleDelete = async (e) => {
@@ -25,50 +25,67 @@ function DocumentCard({ doc, onDelete }) {
     }
 
     return (
-        <div className="card-hover group relative flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            {/* File icon */}
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${cat.bg} ${cat.border} border text-2xl`}>
-                {cat.icon}
+        <div className="bg-white dark:bg-surface-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 shadow-sm hover:border-primary-500/30 hover:shadow-md transition-all duration-300 group flex flex-col md:flex-row items-center gap-6">
+            {/* Thumbnail/Icon */}
+            <div className={`w-20 h-20 md:w-24 md:h-24 rounded-2xl flex-shrink-0 flex items-center justify-center text-3xl ${cat.bg} border-2 border-white dark:border-slate-800 shadow-sm overflow-hidden relative group-hover:scale-105 transition-transform duration-500`}>
+                {doc.thumbnail_path ? (
+                    <img src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/documents/${doc.thumbnail_path}`} alt="" className="w-full h-full object-cover" />
+                ) : (
+                    <span className="relative z-10">{cat.icon}</span>
+                )}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
             </div>
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold text-slate-200 group-hover:text-white truncate">{doc.title}</p>
-                    <span className={`badge ${cat.bg} ${cat.color} ${cat.border} border`}>{cat.label}</span>
-                    {doc.status === 'processing' && (
-                        <span className="badge bg-amber-500/10 text-amber-400 border border-amber-500/30 animate-pulse-slow">
-                            ⏳ Processando OCR
+            {/* Content */}
+            <div className="flex-1 min-w-0 text-center md:text-left">
+                <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2">
+                    <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight truncate group-hover:text-primary-500 transition-colors">
+                        {doc.title}
+                    </h3>
+                    <div className="flex items-center justify-center md:justify-start gap-2">
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${cat.bg} ${cat.color} border border-white dark:border-slate-800 shadow-sm`}>
+                            {cat.label}
                         </span>
-                    )}
+                        {doc.status === 'processing' && (
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-500 text-white animate-pulse">
+                                Processing
+                            </span>
+                        )}
+                    </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
-                    <span className="text-xs text-slate-500">{getFileIcon(doc.file_type)} {doc.filename}</span>
-                    <span className="text-xs text-slate-500">{formatFileSize(doc.file_size)}</span>
-                    <span className="text-xs text-slate-500">{formatDate(doc.created_at)}</span>
+
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2">
+                    <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-bold text-[11px] uppercase tracking-wider">
+                        <FileText size={12} strokeWidth={2.5} className="text-primary-500" />
+                        {doc.filename}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-bold text-[11px] uppercase tracking-wider">
+                        <SlidersHorizontal size={12} strokeWidth={2.5} className="text-primary-500" />
+                        {formatFileSize(doc.file_size)}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-bold text-[11px] uppercase tracking-wider">
+                        <Clock size={12} strokeWidth={2.5} className="text-primary-500" />
+                        {formatDate(doc.created_at)}
+                    </div>
                 </div>
-                {doc.ocr_text && (
-                    <p className="text-xs text-slate-600 mt-1 truncate max-w-xl">
-                        {doc.ocr_text.substring(0, 120)}...
-                    </p>
-                )}
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 md:pl-2">
                 <Link
                     to={`/documents/${doc.id}`}
-                    className="btn-ghost text-xs px-2.5 py-1.5"
+                    className="p-3 rounded-xl bg-slate-50 dark:bg-surface-950 text-slate-600 dark:text-slate-400 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 transition-all border border-slate-100 dark:border-slate-800 shadow-sm"
+                    title="Visualizar Detalhes"
                 >
-                    <Eye size={14} />
-                    Ver
+                    <Eye size={20} />
                 </Link>
                 <button
                     onClick={handleDelete}
                     disabled={deleting}
-                    className="btn-ghost text-xs px-2.5 py-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                    className="p-3 rounded-xl bg-slate-50 dark:bg-surface-950 text-slate-400 hover:bg-rose-500 hover:text-white transition-all border border-slate-100 dark:border-slate-800 shadow-sm disabled:opacity-50"
+                    title="Excluir Registro"
                 >
-                    {deleting ? <div className="w-3.5 h-3.5 spinner" /> : <Trash2 size={14} />}
+                    {deleting ? <div className="w-5 h-5 spinner" /> : <Trash2 size={20} />}
                 </button>
             </div>
         </div>
@@ -80,7 +97,7 @@ export default function DocumentsPage() {
     const [total, setTotal] = useState(0)
     const [loading, setLoading] = useState(true)
     const [showFilters, setShowFilters] = useState(false)
-    const [filters, setFilters] = useState({ category: '', dateFrom: '', dateTo: '' })
+    const [filters, setFilters] = useState({ category: '', dateFrom: '', dateTo: '', search: '' })
     const [dbCategories, setDbCategories] = useState([])
 
     useEffect(() => {
@@ -94,6 +111,7 @@ export default function DocumentsPage() {
             if (filters.category) params.category = filters.category
             if (filters.dateFrom) params.dateFrom = filters.dateFrom
             if (filters.dateTo) params.dateTo = filters.dateTo
+            if (filters.search) params.q = filters.search
 
             const data = await documentsApi.list(params)
             setDocs(data.documents || [])
@@ -108,79 +126,91 @@ export default function DocumentsPage() {
     useEffect(() => { loadDocs() }, [loadDocs])
 
     const handleDelete = (id) => setDocs(prev => prev.filter(d => d.id !== id))
-    const clearFilters = () => setFilters({ category: '', dateFrom: '', dateTo: '' })
-    const hasFilters = filters.category || filters.dateFrom || filters.dateTo
+    const clearFilters = () => setFilters({ category: '', dateFrom: '', dateTo: '', search: '' })
+    const hasFilters = filters.category || filters.dateFrom || filters.dateTo || filters.search
 
     return (
-        <div className="space-y-5 animate-slide-up">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+        <div className="space-y-10 animate-slide-up pb-10">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-                        <FileText size={22} className="text-primary-400" />
-                        Documentos
+                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-none uppercase">
+                        Arquivo <span className="text-primary-500">Digital</span>
                     </h1>
-                    <p className="text-slate-400 text-sm mt-0.5">
-                        {total} documento{total !== 1 ? 's' : ''} no seu acervo
+                    <p className="text-slate-500 dark:text-slate-400 font-bold text-sm mt-3 uppercase tracking-widest">
+                        Total de {total} registros localizados
                     </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     <button
                         onClick={() => setShowFilters(!showFilters)}
-                        className={`btn-secondary text-sm ${hasFilters ? 'border-primary-500/50 text-primary-400' : ''}`}
+                        className={`btn-secondary py-3 px-6 ${showFilters || hasFilters ? 'bg-primary-500/10 border-primary-500/30 text-primary-500' : ''}`}
                     >
-                        <SlidersHorizontal size={15} />
-                        Filtros
-                        {hasFilters && <span className="w-1.5 h-1.5 rounded-full bg-primary-400" />}
+                        <SlidersHorizontal size={18} />
+                        <span>Parâmetros</span>
+                        {hasFilters && <div className="w-2 h-2 rounded-full bg-primary-500 shadow-[0_0_8px_rgba(17,17,212,0.5)] animate-pulse" />}
                     </button>
-                    <Link to="/search" className="btn-ghost text-sm">
-                        <Search size={15} />
-                        Buscar
+                    <Link to="/upload" className="btn-primary py-3 px-6">
+                        <Upload size={18} />
+                        <span>Novo Upload</span>
                     </Link>
                 </div>
             </div>
 
             {/* Filters panel */}
             {showFilters && (
-                <div className="card animate-fade-in">
-                    <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-semibold text-slate-300 flex items-center gap-2">
-                            <Filter size={14} className="text-primary-400" />
-                            Filtros
-                        </h3>
+                <div className="bg-white dark:bg-surface-900 p-8 rounded-[2rem] border-2 border-primary-500/20 shadow-xl shadow-primary-500/5 backdrop-blur-xl animate-fade-in relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4">
                         {hasFilters && (
-                            <button onClick={clearFilters} className="text-xs text-primary-400 hover:text-primary-300 flex items-center gap-1">
-                                <X size={12} />
-                                Limpar
+                            <button onClick={clearFilters} className="text-[10px] font-black uppercase tracking-widest text-primary-500 bg-primary-500/10 px-3 py-1.5 rounded-full hover:bg-primary-500 hover:text-white transition-all flex items-center gap-2">
+                                <X size={12} strokeWidth={3} />
+                                Limpar Tudo
                             </button>
                         )}
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                        <div className="md:col-span-1">
+                            <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 block">Pesquisa Rápida</label>
+                            <div className="relative group">
+                                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary-500 transition-colors" />
+                                <input
+                                    type="text"
+                                    className="input pl-12 h-12 rounded-xl text-sm"
+                                    placeholder="Nome, ID ou OCR..."
+                                    value={filters.search}
+                                    onChange={e => setFilters(f => ({ ...f, search: e.target.value }))}
+                                />
+                            </div>
+                        </div>
+
                         <div>
-                            <label className="text-xs font-medium text-slate-400 mb-1.5 block">Categoria</label>
+                            <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 block">Classificação</label>
                             <select
-                                className="select text-sm"
+                                className="select h-12 rounded-xl text-sm"
                                 value={filters.category}
                                 onChange={e => setFilters(f => ({ ...f, category: e.target.value }))}
                             >
-                                <option value="">Todas</option>
+                                <option value="">Todos os Tipos</option>
                                 {dbCategories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
                             </select>
                         </div>
+
                         <div>
-                            <label className="text-xs font-medium text-slate-400 mb-1.5 block">Data inicial</label>
+                            <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 block">Período (De)</label>
                             <input
                                 type="date"
-                                className="input text-sm"
+                                className="input h-12 rounded-xl text-sm"
                                 value={filters.dateFrom}
                                 onChange={e => setFilters(f => ({ ...f, dateFrom: e.target.value }))}
                             />
                         </div>
+
                         <div>
-                            <label className="text-xs font-medium text-slate-400 mb-1.5 block">Data final</label>
+                            <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 block">Período (Até)</label>
                             <input
                                 type="date"
-                                className="input text-sm"
+                                className="input h-12 rounded-xl text-sm"
                                 value={filters.dateTo}
                                 onChange={e => setFilters(f => ({ ...f, dateTo: e.target.value }))}
                             />
@@ -189,31 +219,36 @@ export default function DocumentsPage() {
                 </div>
             )}
 
-            {/* Documents list */}
+            {/* Documents Section */}
             {loading ? (
-                <div className="space-y-3">
-                    {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-24 rounded-2xl" />)}
+                <div className="grid grid-cols-1 gap-4">
+                    {[...Array(5)].map((_, i) => (
+                        <div key={i} className="skeleton h-32 rounded-2xl" />
+                    ))}
                 </div>
             ) : docs.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-surface-800 flex items-center justify-center mb-4 border border-slate-700">
-                        <FileText size={26} className="text-slate-600" />
+                <div className="py-32 flex flex-col items-center justify-center text-center bg-white dark:bg-surface-900 rounded-[2.5rem] border-2 border-dashed border-slate-100 dark:border-slate-800">
+                    <div className="w-24 h-24 rounded-full bg-slate-50 dark:bg-surface-950 flex items-center justify-center mb-6 text-slate-200 dark:text-slate-800 shadow-inner">
+                        <FileText size={48} strokeWidth={1} />
                     </div>
-                    <p className="text-slate-300 font-semibold text-lg">Nenhum documento encontrado</p>
-                    <p className="text-slate-500 text-sm mt-1">
-                        {hasFilters ? 'Tente ajustar os filtros.' : 'Comece enviando seu primeiro documento.'}
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Vazio Absoluto</h3>
+                    <p className="text-slate-400 font-bold text-sm mt-3 max-w-xs mx-auto uppercase tracking-wide">
+                        {hasFilters ? 'Nenhum registro corresponde aos seus parâmetros de busca.' : 'Seu arquivo digital está pronto para receber o primeiro documento.'}
                     </p>
-                    {hasFilters && (
-                        <button onClick={clearFilters} className="btn-ghost mt-3 text-sm text-primary-400">
-                            <X size={14} />
-                            Limpar filtros
+                    {hasFilters ? (
+                        <button onClick={clearFilters} className="mt-8 btn-secondary font-black text-[10px] uppercase tracking-widest">
+                            Resetar Parâmetros
                         </button>
+                    ) : (
+                        <Link to="/upload" className="mt-8 btn-primary font-black text-[10px] uppercase tracking-widest px-10">
+                            Iniciar Captura
+                        </Link>
                     )}
                 </div>
             ) : (
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 gap-5">
                     {docs.map(doc => (
-                        <DocumentCard key={doc.id} doc={doc} onDelete={handleDelete} />
+                        <DocumentCard key={doc.id} doc={doc} onDelete={handleDelete} dbCategories={dbCategories} />
                     ))}
                 </div>
             )}

@@ -11,10 +11,14 @@ import toast from 'react-hot-toast'
 
 function DetailRow({ icon: Icon, label, value, mono = false }) {
     return (
-        <div className="flex items-start gap-3 py-2.5 border-b border-slate-800/60 last:border-0">
-            <Icon size={14} className="text-slate-500 mt-0.5 flex-shrink-0" />
-            <span className="text-xs text-slate-500 w-24 flex-shrink-0">{label}</span>
-            <span className={`text-sm text-slate-300 ${mono ? 'font-mono text-xs' : ''} break-all`}>{value}</span>
+        <div className="flex items-center justify-between py-4 border-b border-slate-100 dark:border-slate-800/60 last:border-0 group">
+            <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-slate-50 dark:bg-surface-950 text-slate-400 group-hover:text-primary-500 transition-colors">
+                    <Icon size={14} strokeWidth={2.5} />
+                </div>
+                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{label}</span>
+            </div>
+            <span className={`text-xs font-bold text-slate-700 dark:text-slate-300 ${mono ? 'font-mono' : ''} text-right break-all ml-4`}>{value}</span>
         </div>
     )
 }
@@ -26,7 +30,7 @@ export default function DocumentDetailPage() {
     const [loading, setLoading] = useState(true)
     const [fileUrl, setFileUrl] = useState(null)
     const [copied, setCopied] = useState(false)
-    const [activeTab, setActiveTab] = useState('preview') // preview | text | chat | history
+    const [activeTab, setActiveTab] = useState('preview') // preview | text | ai_fields | chat | history
     const [question, setQuestion] = useState('')
     const [chatLoading, setChatLoading] = useState(false)
     const [messages, setMessages] = useState([]) // { role: 'user'|'ai', content: string }
@@ -40,21 +44,14 @@ export default function DocumentDetailPage() {
             try {
                 const data = await documentsApi.get(id)
                 setDoc(data)
-                // Tentar obter URL do arquivo
                 try {
                     const { url } = await documentsApi.getSignedUrl(id)
                     setFileUrl(url)
-                } catch {
-                    // Mock mode ou erro: URL não disponível
-                }
-                // Carregar logs de auditoria
+                } catch { }
                 try {
                     const logs = await documentsApi.getAudit(id)
                     setAuditLogs(logs)
-                } catch {
-                    console.log('Audit logs not supported')
-                }
-                // Carregar categorias
+                } catch { }
                 try {
                     const cats = await categoriesApi.list()
                     setDbCategories(cats)
@@ -80,9 +77,15 @@ export default function DocumentDetailPage() {
 
     if (loading) {
         return (
-            <div className="max-w-4xl mx-auto space-y-4">
-                <div className="skeleton h-8 w-48" />
-                <div className="skeleton h-96 rounded-2xl" />
+            <div className="max-w-6xl mx-auto space-y-8 animate-pulse">
+                <div className="h-10 w-64 bg-slate-200 dark:bg-surface-800 rounded-xl" />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2 h-[600px] bg-slate-100 dark:bg-surface-900 rounded-[2.5rem]" />
+                    <div className="space-y-6">
+                        <div className="h-48 bg-slate-100 dark:bg-surface-900 rounded-[2rem]" />
+                        <div className="h-64 bg-slate-100 dark:bg-surface-900 rounded-[2rem]" />
+                    </div>
+                </div>
             </div>
         )
     }
@@ -91,466 +94,404 @@ export default function DocumentDetailPage() {
     const cat = getCategoryInfo(doc.category, dbCategories)
 
     return (
-        <div className="max-w-4xl mx-auto space-y-5 animate-slide-up">
-            {/* Back + header */}
-            <div className="flex items-start gap-4">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="btn-ghost p-2 mt-0.5"
-                >
-                    <ArrowLeft size={18} />
-                </button>
-                <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <span className={`badge ${cat.bg} ${cat.color} ${cat.border} border`}>
-                            {cat.icon} {cat.label}
-                        </span>
-                        {doc.status === 'processing' && (
-                            <span className="badge bg-amber-500/10 text-amber-400 border border-amber-500/30 animate-pulse-slow">
-                                <Cpu size={10} /> OCR em andamento
+        <div className="max-w-[1400px] mx-auto space-y-8 animate-slide-up pb-20 px-2 lg:px-6">
+            {/* Extended Header with Breadcrumbs and Actions */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-slate-100 dark:border-slate-800 pb-8">
+                <div className="flex items-center gap-6">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="w-12 h-12 rounded-2xl bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 hover:text-primary-500 hover:border-primary-500/30 transition-all shadow-sm group"
+                    >
+                        <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                    </button>
+                    <div>
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${cat.bg} ${cat.color} border border-white dark:border-surface-950 shadow-sm`}>
+                                {cat.icon} {cat.label}
                             </span>
-                        )}
-                        {doc.status === 'completed' && (
-                            <span className="badge bg-green-500/10 text-green-400 border border-green-500/30">
-                                <CheckCircle size={10} /> OCR concluído
-                            </span>
-                        )}
-                    </div>
-                    <h1 className="text-xl font-bold text-white leading-snug">{doc.title}</h1>
-
-                    {doc.ai_category_suggestion && doc.ai_category_suggestion !== doc.category && (
-                        <div className="mt-2 flex items-center gap-2 p-2 rounded-lg bg-primary-600/10 border border-primary-500/20 text-[10px] text-primary-300">
-                            <Sparkles size={12} />
-                            A IA sugere que este documento é da categoria <b>{getCategoryInfo(doc.ai_category_suggestion, dbCategories).label}</b>.
-                            <button
-                                onClick={async () => {
-                                    try {
-                                        const updated = await documentsApi.updateStatus(doc.id, doc.approval_status, doc.approval_notes, doc.ai_category_suggestion);
-                                        // Nota: updateStatus no backend precisa aceitar categoria opcional. Vou ajustar.
-                                        setDoc(prev => ({ ...prev, category: doc.ai_category_suggestion }));
-                                        toast.success('Categoria atualizada pela sugestão da IA');
-                                    } catch { toast.error('Erro ao atualizar categoria'); }
-                                }}
-                                className="ml-auto underline font-bold"
-                            >
-                                Alterar agora
-                            </button>
+                            {doc.status === 'processing' ? (
+                                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-500 text-white animate-pulse">
+                                    <Cpu size={10} strokeWidth={3} /> Sincronizando OCR
+                                </span>
+                            ) : (
+                                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+                                    <CheckCircle size={10} strokeWidth={3} /> Análise Concluída
+                                </span>
+                            )}
                         </div>
+                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none truncate max-w-2xl">
+                            {doc.title}
+                        </h1>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3 lg:self-end">
+                    {fileUrl && (
+                        <a
+                            href={fileUrl}
+                            download={doc.filename}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="btn-secondary py-3 px-6 h-12"
+                        >
+                            <Download size={18} />
+                            <span>Extrair Original</span>
+                        </a>
                     )}
+                    <button className="btn-primary py-3 px-6 h-12 shadow-lg shadow-primary-500/20">
+                        <ExternalLink size={18} />
+                        <span>Compartilhar</span>
+                    </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                {/* Main content */}
-                <div className="lg:col-span-2 space-y-4">
-                    {/* Tabs */}
-                    <div className="flex gap-1 p-1 bg-surface-800 rounded-xl w-fit overflow-x-auto">
-                        {['preview', 'text', 'ai_fields', 'chat', 'history'].map(tab => (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                {/* Main Content Area */}
+                <div className="lg:col-span-8 space-y-8">
+                    {/* Glass-style Navigation Tabs */}
+                    <div className="flex items-center gap-1 p-1.5 bg-slate-100 dark:bg-surface-950 rounded-[1.5rem] w-fit border border-slate-200 dark:border-slate-800 shadow-inner">
+                        {[
+                            { id: 'preview', label: 'Visualização', icon: Eye },
+                            { id: 'ai_fields', label: 'Camos IA', icon: Sparkles },
+                            { id: 'text', label: 'Transcrição', icon: FileText },
+                            { id: 'chat', label: 'Consultoria', icon: Cpu },
+                            { id: 'history', label: 'Auditoria', icon: Shield }
+                        ].map(tab => (
                             <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${activeTab === tab
-                                    ? 'bg-primary-600 text-white shadow-sm'
-                                    : 'text-slate-400 hover:text-slate-200'
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap
+                                    ${activeTab === tab.id
+                                        ? 'bg-white dark:bg-surface-800 text-primary-500 shadow-md ring-1 ring-black/5'
+                                        : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                                     }`}
                             >
-                                {tab === 'preview' ? '👁️ Preview' : tab === 'text' ? '📝 Texto' : tab === 'ai_fields' ? '✨ Campos IA' : tab === 'chat' ? '🤖 Chat' : '🛡️ Logs'}
+                                <tab.icon size={14} strokeWidth={activeTab === tab.id ? 3 : 2} />
+                                {tab.label}
                             </button>
                         ))}
                     </div>
 
-                    {/* Preview tab with Watermark (Phase 4) */}
-                    {activeTab === 'preview' && (
-                        <div className="card p-0 overflow-hidden relative group">
-                            {fileUrl ? (
-                                <>
-                                    {/* Marca d'água dinâmica (Phase 4) - Mais visível */}
-                                    <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden opacity-[0.08] select-none flex flex-wrap justify-around content-around rotate-[-30deg]">
-                                        {Array(80).fill(0).map((_, i) => (
-                                            <span key={i} className="text-xs font-bold m-4 whitespace-nowrap text-white">
-                                                ARCSCAN - {localStorage.getItem('docsearch_user') ? JSON.parse(localStorage.getItem('docsearch_user')).email : 'CONFIDENCIAL'}
-                                            </span>
+                    {/* Content Panel */}
+                    <div className="bg-white dark:bg-surface-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800/60 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden relative">
+                        {/* Preview Tab */}
+                        {activeTab === 'preview' && (
+                            <div className="relative animate-fade-in min-h-[700px]">
+                                {fileUrl ? (
+                                    <>
+                                        {/* Dynamic Watermark - More Stylized */}
+                                        <div className="absolute inset-0 z-20 pointer-events-none opacity-[0.03] overflow-hidden select-none rotate-[-45deg] flex flex-wrap justify-center content-center pointer-events-none">
+                                            {Array(120).fill(0).map((_, i) => (
+                                                <div key={i} className="text-[10px] font-black m-6 text-slate-900 dark:text-white uppercase tracking-[0.5em] whitespace-nowrap">
+                                                    ARCSCAN • {localStorage.getItem('docsearch_user') ? JSON.parse(localStorage.getItem('docsearch_user')).email : 'CONFIDENCIAL'}
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {doc.file_type === 'application/pdf' ? (
+                                            <iframe src={`${fileUrl}#toolbar=0`} className="w-full h-[700px] border-0 relative z-10" title={doc.title} />
+                                        ) : (
+                                            <div className="flex items-center justify-center p-12 bg-slate-50 dark:bg-surface-950/50 min-h-[700px]">
+                                                <img src={fileUrl} alt={doc.title} className="max-w-full max-h-[600px] rounded-2xl object-contain shadow-2xl border border-white dark:border-slate-800" />
+                                            </div>
+                                        )}
+                                    </>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-40 text-center">
+                                        <div className="w-24 h-24 rounded-[2rem] bg-slate-50 dark:bg-surface-950 flex items-center justify-center mb-6 border border-slate-100 dark:border-slate-800 shadow-inner">
+                                            <AlertCircle size={40} strokeWidth={1} className="text-slate-300" />
+                                        </div>
+                                        <h3 className="text-xl font-black text-slate-400 uppercase tracking-tight">Fonte offline</h3>
+                                        <p className="text-xs font-bold text-slate-500 mt-2 uppercase tracking-widest leading-relaxed">O arquivo original não pôde ser<br />carregado no visualizador seguro.</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* AI Fields Tab */}
+                        {activeTab === 'ai_fields' && (
+                            <div className="p-10 animate-fade-in space-y-10">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Estrutura de Dados</h3>
+                                        <p className="text-slate-500 font-bold text-[10px] mt-1 uppercase tracking-widest">Informações mapeadas pelo motor de IA</p>
+                                    </div>
+                                    <button
+                                        onClick={async () => {
+                                            setExtracting(true);
+                                            try {
+                                                const fields = await documentsApi.extractFields(doc.id);
+                                                setAiFields(fields);
+                                                toast.success('Mapeamento concluído!');
+                                            } catch { toast.error('Falha no mapeamento IA'); }
+                                            finally { setExtracting(false); }
+                                        }}
+                                        disabled={extracting || !doc.ocr_text}
+                                        className="btn-primary h-12 px-8 rounded-xl shadow-lg shadow-primary-500/20"
+                                    >
+                                        {extracting ? <div className="w-4 h-4 spinner mr-2" /> : <Sparkles size={16} className="mr-2" />}
+                                        <span className="text-xs font-black uppercase tracking-widest">Re-analisar Documento</span>
+                                    </button>
+                                </div>
+
+                                {aiFields ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-up">
+                                        {Object.entries(aiFields).map(([key, val]) => (
+                                            <div key={key} className="p-6 rounded-[1.5rem] bg-slate-50 dark:bg-surface-950 border border-slate-100 dark:border-slate-800 hover:border-primary-500/20 transition-all group">
+                                                <div className="flex items-center gap-2 mb-3">
+                                                    <div className="w-2 h-2 rounded-full bg-primary-500 shadow-[0_0_8px_rgba(17,17,212,0.4)]" />
+                                                    <p className="text-[10px] uppercase font-black text-slate-400 group-hover:text-primary-500 transition-colors tracking-[0.15em]">{key.replace(/_/g, ' ')}</p>
+                                                </div>
+                                                <div className="text-sm font-black text-slate-700 dark:text-slate-200 bg-white dark:bg-surface-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm leading-relaxed">
+                                                    {typeof val === 'object' && val !== null
+                                                        ? JSON.stringify(val, null, 2)
+                                                        : (val || 'PENDENTE')}
+                                                </div>
+                                            </div>
                                         ))}
                                     </div>
+                                ) : (
+                                    <div className="py-24 text-center border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[2.5rem]">
+                                        <div className="w-20 h-20 bg-primary-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                                            <Cpu size={36} className="text-primary-500" />
+                                        </div>
+                                        <h4 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Pronto para Mapeamento</h4>
+                                        <p className="text-xs font-bold text-slate-500 mt-3 max-w-sm mx-auto uppercase tracking-widest leading-relaxed">
+                                            Inicie o processo de extração para identificar campos específicos como valores, datas e IDs.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
-                                    {doc.file_type === 'application/pdf' ? (
-                                        <iframe src={fileUrl} className="w-full h-[600px] rounded-2xl relative z-0" title={doc.title} />
-                                    ) : (
-                                        <div className="flex items-center justify-center p-6 bg-surface-900/50">
-                                            <img src={fileUrl} alt={doc.title} className="max-w-full max-h-[560px] rounded-xl object-contain" />
+                        {/* Text Content Tab */}
+                        {activeTab === 'text' && (
+                            <div className="p-10 animate-fade-in h-[700px] flex flex-col">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div>
+                                        <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Transcrição OCR</h3>
+                                        <p className="text-slate-500 font-bold text-[10px] mt-1 uppercase tracking-widest">Conteúdo textual bruto identificado no arquivo</p>
+                                    </div>
+                                    <button onClick={copyText} className="btn-secondary h-10 px-5">
+                                        {copied ? <CheckCircle size={14} className="text-emerald-500" /> : <Copy size={14} />}
+                                        <span className="text-[10px] font-black uppercase tracking-widest">{copied ? 'Copiado' : 'Copiar Texto'}</span>
+                                    </button>
+                                </div>
+
+                                <div className="flex-1 bg-slate-50 dark:bg-surface-950 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-inner overflow-y-auto font-mono text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                    {doc.ocr_text || 'Iniciando processamento de texto...'}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Chat AI Tab */}
+                        {activeTab === 'chat' && (
+                            <div className="h-[700px] flex flex-col animate-fade-in">
+                                <div className="flex-1 overflow-y-auto p-10 space-y-8 custom-scrollbar">
+                                    {messages.length === 0 && (
+                                        <div className="h-full flex flex-col items-center justify-center text-center">
+                                            <div className="w-24 h-24 bg-primary-500 rounded-[2.5rem] flex items-center justify-center text-white mb-8 shadow-2xl shadow-primary-500/30">
+                                                <Cpu size={40} />
+                                            </div>
+                                            <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">IA Generativa</h3>
+                                            <p className="text-xs font-bold text-slate-500 mt-4 max-w-sm mx-auto uppercase tracking-widest leading-relaxed">
+                                                Você pode fazer perguntas complexas sobre o conteúdo, pedir resumos ou tradução.
+                                            </p>
+
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-12 w-full max-w-2xl px-6">
+                                                {[
+                                                    'Qual o valor total líquido?',
+                                                    'Quais as partes envolvidas?',
+                                                    'Resuma as obrigações contratuais',
+                                                    'Extraia todas as datas importantes'
+                                                ].map(suggest => (
+                                                    <button
+                                                        key={suggest}
+                                                        onClick={() => setQuestion(suggest)}
+                                                        className="p-4 bg-white dark:bg-surface-800 border border-slate-100 dark:border-slate-700/50 rounded-2xl text-[10px] font-black text-slate-600 dark:text-slate-400 text-left uppercase tracking-widest hover:border-primary-500 hover:text-primary-500 transition-all shadow-sm group"
+                                                    >
+                                                        <span className="text-primary-500 mr-2">/</span> {suggest}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
-                                </>
-                            ) : (
-                                <div className="flex flex-col items-center justify-center py-16 text-center">
-                                    <div className="w-16 h-16 rounded-2xl bg-surface-700 flex items-center justify-center mb-4 border border-slate-700">
-                                        <span className="text-3xl">{getFileIcon(doc.file_type)}</span>
-                                    </div>
-                                    <p className="text-slate-400 font-medium">Visualização não disponível</p>
+
+                                    {messages.map((m, i) => (
+                                        <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-slide-up`}>
+                                            <div className={`max-w-[80%] p-6 rounded-[2rem] text-sm shadow-sm ${m.role === 'user'
+                                                ? 'bg-primary-500 text-white font-bold rounded-tr-none'
+                                                : 'bg-slate-50 dark:bg-surface-950 border border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-tl-none font-medium leading-relaxed'
+                                                }`}>
+                                                {m.content}
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    {chatLoading && (
+                                        <div className="flex justify-start animate-pulse">
+                                            <div className="bg-slate-100 dark:bg-surface-950 p-6 rounded-[2rem] rounded-tl-none border border-slate-200 dark:border-slate-800">
+                                                <div className="flex gap-2">
+                                                    <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" />
+                                                    <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                                                    <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                    )}
 
-                    {/* AI Fields tab (Phase 1) */}
-                    {activeTab === 'ai_fields' && (
-                        <div className="card space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                                    <Sparkles size={16} className="text-primary-400" />
-                                    Dados Extraídos pela IA
-                                </h3>
-                                <button
-                                    onClick={async () => {
-                                        setExtracting(true);
-                                        try {
-                                            const fields = await documentsApi.extractFields(doc.id);
-                                            setAiFields(fields);
-                                            toast.success('Informações extraídas com sucesso!');
-                                        } catch { toast.error('Erro na extração de campos'); }
-                                        finally { setExtracting(false); }
-                                    }}
-                                    disabled={extracting || !doc.ocr_text}
-                                    className="btn-primary text-xs py-1.5 px-3"
-                                >
-                                    {extracting ? <div className="w-3 h-3 spinner" /> : <Cpu size={12} />}
-                                    {extracting ? 'Extraindo...' : 'Extrair Campos'}
-                                </button>
+                                <div className="p-8 bg-slate-50 dark:bg-surface-950 border-t border-slate-100 dark:border-slate-800">
+                                    <form
+                                        onSubmit={async (e) => {
+                                            e.preventDefault();
+                                            if (!question.trim() || chatLoading) return;
+                                            const userMsg = question.trim();
+                                            setQuestion('');
+                                            setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+                                            setChatLoading(true);
+                                            try {
+                                                const { answer } = await documentsApi.chat(doc.id, userMsg);
+                                                setMessages(prev => [...prev, { role: 'ai', content: answer }]);
+                                            } catch { toast.error('Falha no motor IA'); }
+                                            finally { setChatLoading(false); }
+                                        }}
+                                        className="relative group"
+                                    >
+                                        <input
+                                            type="text"
+                                            className="input h-16 pl-8 pr-20 rounded-[1.5rem] bg-white dark:bg-surface-900 border-2 border-slate-200 dark:border-slate-800 group-focus-within:border-primary-500 transition-all font-bold text-sm"
+                                            placeholder="Interaja com os dados do arquivo..."
+                                            value={question}
+                                            onChange={e => setQuestion(e.target.value)}
+                                            disabled={chatLoading}
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={chatLoading || !question.trim()}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-lg shadow-primary-500/20 disabled:grayscale transition-all active:scale-90"
+                                        >
+                                            <ArrowLeft size={20} strokeWidth={3} className="rotate-180" />
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
+                        )}
 
-                            {aiFields ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 animate-fade-in">
-                                    {Object.entries(aiFields).map(([key, val]) => (
-                                        <div key={key} className="p-3 rounded-xl bg-surface-900/50 border border-slate-700/50">
-                                            <p className="text-[10px] uppercase font-bold text-slate-500 mb-1">{key.replace(/_/g, ' ')}</p>
-                                            <p className="text-sm text-slate-200">
-                                                {typeof val === 'object' && val !== null
-                                                    ? JSON.stringify(val).replace(/["{}]/g, '').replace(/,/g, ', ')
-                                                    : (val || '—')}
-                                            </p>
+                        {/* Audit Tab */}
+                        {activeTab === 'history' && (
+                            <div className="p-10 animate-fade-in space-y-10">
+                                <div>
+                                    <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Logs de Compliance</h3>
+                                    <p className="text-slate-500 font-bold text-[10px] mt-1 uppercase tracking-widest">Trilha de auditoria completa e imutável</p>
+                                </div>
+
+                                <div className="space-y-6">
+                                    {auditLogs.length === 0 ? (
+                                        <p className="text-slate-400 font-bold text-xs p-10 bg-slate-50 dark:bg-surface-950 rounded-2xl text-center uppercase tracking-widest border border-slate-100 dark:border-slate-800">Nenhum evento registrado</p>
+                                    ) : auditLogs.map((log) => (
+                                        <div key={log.id} className="p-6 bg-slate-50 dark:bg-surface-950 rounded-2xl border-l-[6px] border-l-primary-500 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 rounded-xl bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-primary-500">
+                                                    <History size={18} strokeWidth={2.5} />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">{log.action.replace(/_/g, ' ')}</h4>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <User size={12} className="text-slate-400" />
+                                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{log.user_name || 'Sistema'}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.1em]">{formatDate(log.timestamp)}</span>
+                                                <p className="text-[10px] font-bold text-primary-500 bg-primary-500/10 px-2 py-0.5 rounded mt-1 inline-block uppercase">Registro Verificado</p>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
-                            ) : (
-                                <div className="py-12 text-center text-slate-500 border-2 border-dashed border-slate-800 rounded-2xl">
-                                    <Cpu size={32} className="mx-auto mb-3 opacity-20" />
-                                    <p className="text-sm">Clique em "Extrair Campos" para que a IA analise<br />os dados essenciais deste documento.</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {/* OCR Text tab */}
-                    {activeTab === 'text' && (
-                        <div className="card">
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="text-sm font-semibold text-slate-300 flex items-center gap-2">
-                                    <Cpu size={14} className="text-primary-400" />
-                                    Texto extraído por OCR
-                                </h3>
-                                {doc.ocr_text && (
-                                    <button onClick={copyText} className="btn-ghost text-xs px-2.5 py-1.5">
-                                        {copied ? <CheckCircle size={13} className="text-green-400" /> : <Copy size={13} />}
-                                        {copied ? 'Copiado!' : 'Copiar'}
-                                    </button>
-                                )}
                             </div>
-
-                            {doc.status === 'processing' ? (
-                                <div className="flex items-center gap-3 py-8 justify-center text-slate-500">
-                                    <div className="w-5 h-5 spinner" />
-                                    <span className="text-sm">OCR em processamento...</span>
-                                </div>
-                            ) : doc.ocr_text ? (
-                                <pre className="text-sm text-slate-300 whitespace-pre-wrap font-sans leading-relaxed bg-surface-900/50 rounded-xl p-4 max-h-96 overflow-y-auto">
-                                    {doc.ocr_text}
-                                </pre>
-                            ) : (
-                                <div className="flex items-center gap-2 py-6 justify-center text-slate-500">
-                                    <AlertCircle size={16} />
-                                    <span className="text-sm">Texto não disponível</span>
-                                </div>
-                            )}
-
-                            {doc.ocr_text && (
-                                <p className="text-xs text-slate-600 mt-3">
-                                    {doc.ocr_text.length.toLocaleString()} caracteres extraídos
-                                </p>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Chat AI tab */}
-                    {activeTab === 'chat' && (
-                        <div className="card min-h-[500px] flex flex-col p-0 overflow-hidden">
-                            <div className="p-4 border-b border-slate-700/60 flex items-center gap-3 bg-surface-800/20">
-                                <div className="w-8 h-8 rounded-lg bg-primary-600/20 flex items-center justify-center">
-                                    <Cpu size={16} className="text-primary-400" />
-                                </div>
-                                <div>
-                                    <h3 className="text-sm font-semibold text-white">Assistente DocSearch</h3>
-                                    <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">IA Generativa • Analisando {doc.title}</p>
-                                </div>
-                            </div>
-
-                            <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[400px]">
-                                {messages.length === 0 && (
-                                    <div className="h-full flex flex-col items-center justify-center text-center p-8 min-h-[300px]">
-                                        <Sparkles size={32} className="text-primary-500/30 mb-4" />
-                                        <p className="text-slate-400 font-medium">Como posso ajudar com este documento?</p>
-                                        <p className="text-slate-500 text-xs mt-1">Pergunte sobre valores, datas, nomes ou peça um resumo.</p>
-                                        <div className="grid grid-cols-1 gap-2 mt-6 w-full max-w-sm">
-                                            {[
-                                                'Quais os principais valores citados?',
-                                                'Quem são as partes envolvidas?',
-                                                'Faça um resumo deste documento.'
-                                            ].map(suggest => (
-                                                <button
-                                                    key={suggest}
-                                                    type="button"
-                                                    onClick={() => { setQuestion(suggest) }}
-                                                    className="text-xs text-slate-400 hover:text-primary-400 p-2 rounded-lg bg-surface-900/50 border border-slate-700/50 text-left transition-colors"
-                                                >
-                                                    "{suggest}"
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {messages.map((m, i) => (
-                                    <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-                                        <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${m.role === 'user'
-                                            ? 'bg-primary-600 text-white rounded-tr-none'
-                                            : 'bg-surface-900 border border-slate-700 text-slate-300 rounded-tl-none'
-                                            }`}>
-                                            {m.content}
-                                        </div>
-                                    </div>
-                                ))}
-
-                                {chatLoading && (
-                                    <div className="flex justify-start">
-                                        <div className="bg-surface-900 border border-slate-700 p-3 rounded-2xl rounded-tl-none">
-                                            <div className="flex gap-1.5">
-                                                <div className="w-1.5 h-1.5 bg-primary-400 rounded-full animate-bounce" />
-                                                <div className="w-1.5 h-1.5 bg-primary-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                                                <div className="w-1.5 h-1.5 bg-primary-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <form
-                                onSubmit={async (e) => {
-                                    e.preventDefault();
-                                    if (!question.trim() || chatLoading) return;
-
-                                    const userMsg = question.trim();
-                                    const currentQuestion = userMsg;
-                                    setQuestion('');
-                                    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
-                                    setChatLoading(true);
-
-                                    try {
-                                        const { answer } = await documentsApi.chat(doc.id, currentQuestion);
-                                        setMessages(prev => [...prev, { role: 'ai', content: answer }]);
-                                    } catch (err) {
-                                        toast.error('Erro na resposta da IA');
-                                    } finally {
-                                        setChatLoading(false);
-                                    }
-                                }}
-                                className="p-4 border-t border-slate-700/60 bg-surface-800/50"
-                            >
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        className="input pr-12 text-sm"
-                                        placeholder="Pergunte algo sobre o documento..."
-                                        value={question}
-                                        onChange={e => setQuestion(e.target.value)}
-                                        disabled={chatLoading}
-                                    />
-                                    <button
-                                        type="submit"
-                                        disabled={chatLoading || !question.trim()}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center text-white disabled:opacity-30 disabled:bg-slate-700 transition-all active:scale-90"
-                                    >
-                                        <ArrowLeft size={14} className="rotate-180" />
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    )}
-
-                    {/* Audit History tab */}
-                    {activeTab === 'history' && (
-                        <div className="card">
-                            <h3 className="text-sm font-semibold text-white mb-6 flex items-center gap-2">
-                                <Shield size={16} className="text-primary-400" />
-                                Trilha de Auditoria e Compliance
-                            </h3>
-
-                            <div className="relative space-y-0 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-surface-700">
-                                {auditLogs.length === 0 ? (
-                                    <p className="text-slate-500 text-sm ml-8 italic">Nenhum registro encontrado.</p>
-                                ) : auditLogs.map((log, idx) => (
-                                    <div key={log.id} className="relative pl-10 pb-8 last:pb-0 group">
-                                        {/* Dot */}
-                                        <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-surface-800 border-2 border-surface-700 flex items-center justify-center z-10 group-hover:border-primary-500 transition-colors">
-                                            <div className="w-2 h-2 rounded-full bg-primary-500" />
-                                        </div>
-
-                                        <div className="flex flex-col">
-                                            <div className="flex flex-wrap items-center gap-2 mb-1">
-                                                <span className="text-[10px] font-bold uppercase tracking-wider text-primary-400">
-                                                    {log.action.replace(/_/g, ' ')}
-                                                </span>
-                                                <span className="text-[10px] text-slate-500 font-mono">
-                                                    {formatDate(log.timestamp)}
-                                                </span>
-                                            </div>
-
-                                            <div className="flex items-center gap-2 text-xs text-slate-300">
-                                                <User size={12} className="text-slate-500" />
-                                                <span className="text-slate-400">Usuário:</span>
-                                                <span className="font-medium">{log.user_name || log.userName || log.user_id || (log.userId === 'mock-user-id' ? 'Você (Admin)' : log.userId) || 'Desconhecido'}</span>
-                                            </div>
-
-                                            {log.details && Object.keys(log.details).length > 0 && (
-                                                <div className="mt-2 p-2 rounded-lg bg-surface-900/50 border border-slate-700/50 text-[11px] text-slate-400">
-                                                    {log.action === 'STATUS_CHANGE' && (
-                                                        <span>Status alterado para <b>{log.details.newStatus}</b>. {log.details.notes}</span>
-                                                    )}
-                                                    {log.action === 'UPLOAD' && (
-                                                        <span>Arquivo <b>{log.details.filename}</b> enviado.</span>
-                                                    )}
-                                                    {log.action === 'IA_CHAT' && (
-                                                        <span>Consultou IA: "{log.details.question}..."</span>
-                                                    )}
-                                                    {log.action === 'FILE_VIEW' && (
-                                                        <span>Visualizou o arquivo original.</span>
-                                                    )}
-                                                    {log.action === 'DELETE' && (
-                                                        <span>Removeu o documento: {log.details.title}</span>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
 
-                {/* Sidebar info */}
-                <div className="space-y-4">
-                    {/* Approval Section */}
-                    <div className="card border-primary-500/20 bg-primary-600/5">
-                        <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-                            <CheckCircle size={16} className="text-primary-400" />
-                            Gestão de Status
-                        </h3>
+                {/* Sidebar - Meta & Actions */}
+                <div className="lg:col-span-4 space-y-8">
+                    {/* Status Management */}
+                    <div className="bg-white dark:bg-surface-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                            <CheckCircle size={14} className="text-primary-500" />
+                            Controle de Status
+                        </h4>
 
-                        <div className="space-y-3">
-                            <div className="flex flex-wrap gap-2">
-                                {[
-                                    { id: 'pending', label: 'Pendente', color: 'bg-slate-700 text-slate-300' },
-                                    { id: 'reviewing', label: 'Em Revisão', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
-                                    { id: 'approved', label: 'Aprovado', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
-                                    { id: 'rejected', label: 'Rejeitado', color: 'bg-red-500/20 text-red-400 border-red-500/30' }
-                                ].map(s => (
-                                    <button
-                                        key={s.id}
-                                        disabled={loading}
-                                        onClick={async () => {
-                                            try {
-                                                const updated = await documentsApi.updateStatus(doc.id, s.id, doc.approval_notes);
-                                                setDoc(updated);
-                                                toast.success(`Status alterado para ${s.label}`);
-                                            } catch {
-                                                toast.error('Erro ao atualizar status');
-                                            }
-                                        }}
-                                        className={`text-[10px] px-2 py-1 rounded-md font-bold uppercase tracking-wider transition-all border ${doc.approval_status === s.id
-                                            ? `${s.color} ring-1 ring-white/20`
-                                            : 'bg-surface-800 text-slate-500 border-slate-700 hover:border-slate-500'
-                                            }`}
-                                    >
-                                        {s.label}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div className="pt-2">
-                                <label className="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Observações internas</label>
-                                <textarea
-                                    className="w-full bg-surface-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-300 focus:border-primary-500 outline-none min-h-[60px]"
-                                    placeholder="Adicione notas sobre a aprovação..."
-                                    defaultValue={doc.approval_notes || ''}
-                                    onBlur={async (e) => {
-                                        const val = e.target.value;
-                                        if (val !== doc.approval_notes) {
-                                            try {
-                                                const updated = await documentsApi.updateStatus(doc.id, doc.approval_status, val);
-                                                setDoc(updated);
-                                                toast.success('Notas atualizadas');
-                                            } catch {
-                                                toast.error('Erro ao salvar notas');
-                                            }
-                                        }
+                        <div className="grid grid-cols-2 gap-3">
+                            {[
+                                { id: 'pending', label: 'Pendente', bg: 'bg-slate-100 dark:bg-surface-800', active: 'bg-slate-900 text-white border-slate-900' },
+                                { id: 'reviewing', label: 'Revisão', bg: 'bg-amber-50 dark:bg-amber-500/5', active: 'bg-amber-500 text-white border-amber-500' },
+                                { id: 'approved', label: 'Aprovar', bg: 'bg-emerald-50 dark:bg-emerald-500/5', active: 'bg-emerald-500 text-white border-emerald-500' },
+                                { id: 'rejected', label: 'Rejeitar', bg: 'bg-rose-50 dark:bg-rose-500/5', active: 'bg-rose-500 text-white border-rose-500' }
+                            ].map(s => (
+                                <button
+                                    key={s.id}
+                                    onClick={async () => {
+                                        try {
+                                            const updated = await documentsApi.updateStatus(doc.id, s.id, doc.approval_notes);
+                                            setDoc(updated);
+                                            toast.success(`Definido como ${s.label}`);
+                                        } catch { toast.error('Falha na atualização'); }
                                     }}
-                                />
-                            </div>
+                                    className={`p-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all
+                                        ${doc.approval_status === s.id ? s.active : `${s.bg} border-transparent text-slate-500 dark:text-slate-400 hover:border-slate-200`}
+                                    `}
+                                >
+                                    {s.label}
+                                </button>
+                            ))}
+                        </div>
 
-                            {doc.reviewed_at && (
-                                <p className="text-[9px] text-slate-600 italic">
-                                    Última revisão: {new Date(doc.reviewed_at).toLocaleString()}
-                                </p>
-                            )}
+                        <div className="mt-8">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Notas Internas</label>
+                            <textarea
+                                className="w-full bg-slate-50 dark:bg-surface-950 border border-slate-100 dark:border-slate-800 rounded-[1.25rem] p-4 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:border-primary-500 transition-all min-h-[120px]"
+                                placeholder="Notas de conformidade..."
+                                defaultValue={doc.approval_notes || ''}
+                                onBlur={async (e) => {
+                                    if (e.target.value !== doc.approval_notes) {
+                                        try {
+                                            const updated = await documentsApi.updateStatus(doc.id, doc.approval_status, e.target.value);
+                                            setDoc(updated);
+                                            toast.success('Notas salvas');
+                                        } catch { toast.error('Erro ao salvar'); }
+                                    }
+                                }}
+                            />
                         </div>
                     </div>
 
-                    <div className="card">
-                        <h3 className="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
-                            <FileText size={14} className="text-primary-400" />
-                            Informações
-                        </h3>
-                        <div>
-                            <DetailRow icon={Tag} label="Categoria" value={cat.label} />
-                            <DetailRow icon={HardDrive} label="Tamanho" value={formatFileSize(doc.file_size)} />
-                            <DetailRow icon={FileText} label="Tipo" value={doc.file_type?.split('/')[1]?.toUpperCase() || '—'} />
-                            <DetailRow icon={Calendar} label="Vencimento" value={formatDate(doc.expires_at) || '—'} />
-                            <DetailRow icon={Calendar} label="Upload" value={formatDate(doc.created_at)} />
-                            <DetailRow icon={Calendar} label="Atualizado" value={formatDate(doc.updated_at)} />
+                    {/* Metadata Details */}
+                    <div className="bg-white dark:bg-surface-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                            <Info size={14} className="text-primary-500" />
+                            Propriedades
+                        </h4>
+                        <div className="space-y-1">
+                            <DetailRow icon={HardDrive} label="Armazenamento" value={formatFileSize(doc.file_size)} />
+                            <DetailRow icon={FileText} label="Tipo de Arquivo" value={doc.file_type?.split('/')[1]?.toUpperCase() || 'DESCONHECIDO'} />
+                            <DetailRow icon={Calendar} label="Emissão Original" value={formatDate(doc.created_at)} />
+                            <DetailRow icon={TrendingUp} label="Validade" value={formatDate(doc.expires_at) || 'LONGA DURAÇÃO'} mono />
+                            <DetailRow icon={History} label="Atualização" value={formatDate(doc.updated_at)} />
                         </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="card space-y-2">
-                        <h3 className="text-sm font-semibold text-slate-300 mb-3">Ações</h3>
-                        {fileUrl && (
-                            <a
-                                href={fileUrl}
-                                download={doc.filename}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="btn-secondary w-full justify-center text-sm"
-                            >
-                                <Download size={14} />
-                                Baixar arquivo
-                            </a>
-                        )}
-                        <Link
-                            to={`/search?q=${encodeURIComponent(doc.title.split(' ')[0])}`}
-                            className="btn-ghost w-full justify-center text-sm"
-                        >
-                            <Eye size={14} />
-                            Buscar similares
-                        </Link>
+                    {/* Security Info */}
+                    <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white space-y-4">
+                        <div className="flex items-center gap-3">
+                            <Shield className="text-primary-500" size={24} />
+                            <h4 className="text-sm font-black uppercase tracking-widest">Protocolo Seguro</h4>
+                        </div>
+                        <p className="text-[10px] font-bold text-slate-400 leading-relaxed uppercase tracking-tight">
+                            Este documento está criptografado em repouso. Toda visualização é registrada com marca d'água forense.
+                        </p>
                     </div>
                 </div>
             </div>

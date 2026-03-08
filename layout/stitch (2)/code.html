@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Arcscan | Upload Documents</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1111d4",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101022",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col fixed h-full">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div>
+<h1 class="font-bold text-lg leading-none">Arcscan</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400">AI Intelligence</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined">cloud_upload</span>
+<span class="text-sm font-medium">Uploads</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="text-sm font-medium">Documents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="text-sm font-medium">Insights</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+<div class="mt-4 flex items-center gap-3 px-3">
+<div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+<img alt="User Profile" data-alt="Avatar of the current user profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0hLT6NNu1He6kXleWdAmKU9zWr7Q54hCM2u5Wsp1ymLvIRUsHdmgEWw3DTGLQ6gKPgmluJ8nn667862XPse9S07rWWcQNeA-9OhGMXM4NgAc_VdKZHMRG9QAOw0OIMONlkBUPBL7dyGUUWk8AXhLsKY_9LkLDwRJGON71RziGZL5k2LGt1dzKhRq3XPX0pAjplQxaDUXZ5cABnnqJI5Dy9UhbANv0-lrJA4L0Mw5jqKQYW0wDnVwofBFwRlgAcpPJuqxsIUzpuRMQ"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium truncate">Alex Rivera</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 ml-64 p-8">
+<header class="mb-8">
+<h2 class="text-3xl font-black tracking-tight">Upload Documents</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Harness AI to automatically classify and extract data from your files.</p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Left Column: Upload Area & Queue -->
+<div class="lg:col-span-2 space-y-6">
+<!-- Drop Zone -->
+<div class="bg-white dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-12 text-center flex flex-col items-center justify-center transition-all hover:border-primary/50 group">
+<div class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">upload_file</span>
+</div>
+<h3 class="text-lg font-bold mb-1">Drag &amp; Drop files here</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm mb-6">PDF, DOCX, PNG, or JPG up to 50MB</p>
+<button class="bg-primary text-white px-6 py-2.5 rounded-lg font-bold text-sm transition-opacity hover:opacity-90">
+                            Browse Files
+                        </button>
+</div>
+<!-- Processing Queue -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+<div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+<h4 class="font-bold">Active Processing</h4>
+<span class="text-xs font-bold text-primary px-2 py-1 bg-primary/10 rounded uppercase tracking-wider">2 Files Remaining</span>
+</div>
+<div class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- File Item 1 (Uploading) -->
+<div class="p-4">
+<div class="flex items-center gap-4 mb-3">
+<div class="w-10 h-10 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<p class="text-sm font-semibold">service_agreement_v2.pdf</p>
+<span class="text-xs text-slate-500">65% • 3.2MB / 4.8MB</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[65%] rounded-full"></div>
+</div>
+</div>
+<button class="text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500">
+<span class="material-symbols-outlined text-[14px]">sync</span>
+<span>Uploading to secure cloud...</span>
+</div>
+</div>
+<!-- File Item 2 (Analyzing) -->
+<div class="p-4 bg-slate-50/50 dark:bg-slate-800/20">
+<div class="flex items-center gap-4 mb-2">
+<div class="w-10 h-10 rounded bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
+<span class="material-symbols-outlined">image</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold">invoice_49012.png</p>
+<p class="text-xs text-blue-600 font-medium">Analyzing layout &amp; extracting entities...</p>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" style="animation-delay: 0.2s"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" style="animation-delay: 0.4s"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- File Item 3 (Completed) -->
+<div class="p-4">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-green-50 dark:bg-green-900/30 flex items-center justify-center text-green-600">
+<span class="material-symbols-outlined">verified</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold">employment_contract.pdf</p>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="text-[10px] font-bold bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 px-1.5 py-0.5 rounded uppercase tracking-wide">Detected: Legal Contract</span>
+<span class="text-xs text-slate-400">Processed 2m ago</span>
+</div>
+</div>
+<button class="bg-primary/10 text-primary px-3 py-1 rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">
+                                        Review
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: AI Extraction & Metadata -->
+<div class="space-y-6">
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+<h4 class="font-bold">AI Auto-Extraction</h4>
+</div>
+<div class="space-y-5">
+<div>
+<label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Document Type</label>
+<div class="relative">
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm font-medium py-2.5 pl-3 pr-10 focus:ring-2 focus:ring-primary" type="text" value="Legal Contract"/>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-green-500 text-sm">check_circle</span>
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Entity / Vendor</label>
+<div class="relative">
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm font-medium py-2.5 pl-3 pr-10 focus:ring-2 focus:ring-primary" type="text" value="Acme Dynamics Corp"/>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-green-500 text-sm">check_circle</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Date Found</label>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm font-medium py-2.5 px-3 focus:ring-2 focus:ring-primary" type="text" value="Oct 24, 2023"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Confidence</label>
+<div class="flex items-center gap-2 py-2.5">
+<div class="flex-1 bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+<div class="bg-green-500 h-full w-[98%]"></div>
+</div>
+<span class="text-xs font-bold text-green-600">98%</span>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Key Clauses Found</label>
+<div class="space-y-2">
+<div class="flex items-center gap-2 text-xs bg-slate-50 dark:bg-slate-800 p-2 rounded border border-slate-100 dark:border-slate-700">
+<span class="material-symbols-outlined text-slate-400 text-sm">link</span>
+<span class="truncate">Termination (Section 4.2)</span>
+</div>
+<div class="flex items-center gap-2 text-xs bg-slate-50 dark:bg-slate-800 p-2 rounded border border-slate-100 dark:border-slate-700">
+<span class="material-symbols-outlined text-slate-400 text-sm">link</span>
+<span class="truncate">Liability Cap (Section 8.1)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+<button class="w-full bg-primary text-white py-3 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
+                                Approve &amp; Save to Vault
+                            </button>
+<p class="text-[11px] text-center text-slate-400 mt-4 leading-relaxed">
+                                AI extraction is highly confident. Human review recommended for mission-critical documents.
+                            </p>
+</div>
+</div>
+<!-- Usage Stats -->
+<div class="bg-primary/5 dark:bg-primary/10 rounded-xl p-5 border border-primary/10">
+<h5 class="text-sm font-bold text-primary mb-4">Monthly Document Quota</h5>
+<div class="space-y-3">
+<div class="flex justify-between text-xs font-medium">
+<span class="text-slate-600 dark:text-slate-400">Pages Processed</span>
+<span class="text-primary font-bold">1,240 / 5,000</span>
+</div>
+<div class="w-full bg-primary/20 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[25%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

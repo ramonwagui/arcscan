@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Arcscan Admin Panel</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1111d4",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101022",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 h-full">
+<div class="p-6 flex flex-col gap-6 h-full justify-between">
+<div class="flex flex-col gap-8">
+<div class="flex items-center gap-3">
+<div class="bg-primary size-10 rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">security</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-none">Arcscan Admin</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-normal">v2.4.0-Enterprise</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined text-primary">group</span>
+<p class="text-sm font-semibold">User Management</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">shield_lock</span>
+<p class="text-sm font-medium">RBAC Controls</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<p class="text-sm font-medium">Audit Trail</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium">System Settings</p>
+</a>
+</nav>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3 p-2 bg-slate-50 dark:bg-slate-800 rounded-xl">
+<div class="size-10 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center" data-alt="System administrator profile photo" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC58hjVgs-dJbSFslYkdWkJxSijq2Ou6rMRMtst6H5GhSMSWZwFnpV21POyLicZT9MDwie_XvwseZk7RwH6fAuCBZyG11MfyyiGokhvzAaeuWhOZkoFY-PrloVDUn0bQPhxKRNtYKwKKKnhw431s-fnuB0JSaz1AxycEKHRqsXxZl-1FQ02NmLEIUvgYVX7Z_2SCrak-CuqQuS2tn9CudhFePnfWCw1VVPVG8qQpVrzs9AQUgsMoF5lf9cyODznJo9k9irN4nLlzpJJ')"></div>
+<div class="flex flex-col">
+<p class="text-slate-900 dark:text-slate-100 text-xs font-bold">Admin User</p>
+<p class="text-slate-500 dark:text-slate-400 text-[10px]">Super Admin</p>
+</div>
+</div>
+<button class="w-full flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all">
+<span class="material-symbols-outlined text-sm">logout</span>
+<span class="truncate">Logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark">
+<div class="max-w-6xl mx-auto p-8">
+<!-- Header Section -->
+<div class="flex flex-wrap justify-between items-end gap-4 mb-8">
+<div class="flex flex-col gap-1">
+<h2 class="text-slate-900 dark:text-slate-100 text-3xl font-black tracking-tight">User Management</h2>
+<p class="text-slate-500 dark:text-slate-400 text-base">Security oversight and access control for the Arcscan platform.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 rounded-lg h-10 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-bold shadow-sm">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                        Filter
+                    </button>
+<button class="flex items-center gap-2 rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
+<span class="material-symbols-outlined text-sm">add</span>
+                        Add New User
+                    </button>
+</div>
+</div>
+<!-- Tab Navigation -->
+<div class="mb-6 border-b border-slate-200 dark:border-slate-800">
+<div class="flex gap-8">
+<a class="border-b-2 border-primary text-primary pb-4 px-1 text-sm font-bold" href="#">All Users</a>
+<a class="border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 pb-4 px-1 text-sm font-bold transition-colors" href="#">Admins</a>
+<a class="border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 pb-4 px-1 text-sm font-bold transition-colors" href="#">Active Sessions</a>
+<a class="border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 pb-4 px-1 text-sm font-bold transition-colors" href="#">Pending Invites</a>
+</div>
+</div>
+<!-- User Table -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm mb-8">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50">
+<th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">User Details</th>
+<th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Role</th>
+<th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status</th>
+<th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Last Active</th>
+<th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- User Row 1 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">AR</div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-slate-900 dark:text-slate-100">Alex Rivera</span>
+<span class="text-xs text-slate-500">alex.rivera@arcscan.io</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">System Admin</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-emerald-500"></div>
+<span class="text-sm text-slate-700 dark:text-slate-300">Active</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm text-slate-500 dark:text-slate-400">2 mins ago</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:text-primary/70 font-bold text-sm">Manage</button>
+</td>
+</tr>
+<!-- User Row 2 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xs">SC</div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-slate-900 dark:text-slate-100">Sarah Chen</span>
+<span class="text-xs text-slate-500">s.chen@corp.com</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">Editor</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-emerald-500"></div>
+<span class="text-sm text-slate-700 dark:text-slate-300">Active</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm text-slate-500 dark:text-slate-400">1 hour ago</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:text-primary/70 font-bold text-sm">Manage</button>
+</td>
+</tr>
+<!-- User Row 3 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 font-bold text-xs">MJ</div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-slate-900 dark:text-slate-100">Mike Jones</span>
+<span class="text-xs text-slate-500">mike.j@arcscan.io</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">Viewer</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+<span class="text-sm text-slate-500 dark:text-slate-400">Inactive</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm text-slate-500 dark:text-slate-400">3 days ago</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:text-primary/70 font-bold text-sm">Manage</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Audit Trail Section -->
+<div class="mb-6 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h3 class="text-slate-900 dark:text-slate-100 text-xl font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">history</span>
+                        Audit Trail
+                    </h3>
+<button class="text-primary text-sm font-bold hover:underline">Export Logs</button>
+</div>
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50">
+<th class="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">User</th>
+<th class="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Action Taken</th>
+<th class="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Timestamp</th>
+<th class="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">IP Address</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr>
+<td class="px-6 py-3 text-sm font-medium text-slate-900 dark:text-slate-100">Alex Rivera</td>
+<td class="px-6 py-3 text-sm text-slate-600 dark:text-slate-400">Updated RBAC Policy <span class="text-primary">#9021</span></td>
+<td class="px-6 py-3 text-xs text-slate-500">Oct 24, 2023 14:22:01</td>
+<td class="px-6 py-3 text-xs font-mono text-slate-500">192.168.1.104</td>
+</tr>
+<tr>
+<td class="px-6 py-3 text-sm font-medium text-slate-900 dark:text-slate-100">System</td>
+<td class="px-6 py-3 text-sm text-slate-600 dark:text-slate-400">Automated DB Backup Completed</td>
+<td class="px-6 py-3 text-xs text-slate-500">Oct 24, 2023 12:00:00</td>
+<td class="px-6 py-3 text-xs font-mono text-slate-500">127.0.0.1</td>
+</tr>
+<tr>
+<td class="px-6 py-3 text-sm font-medium text-slate-900 dark:text-slate-100">Sarah Chen</td>
+<td class="px-6 py-3 text-sm text-slate-600 dark:text-slate-400">Login Successful</td>
+<td class="px-6 py-3 text-xs text-slate-500">Oct 24, 2023 10:45:12</td>
+<td class="px-6 py-3 text-xs font-mono text-slate-500">142.90.12.33</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- RBAC Controls & System Settings Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
+<!-- RBAC Quick Stats -->
+<div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-slate-900 dark:text-slate-100 font-bold">RBAC Configuration</h4>
+<span class="material-symbols-outlined text-slate-400">lock_open</span>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-center text-sm p-2 rounded bg-slate-50 dark:bg-slate-800">
+<span class="text-slate-600 dark:text-slate-400">Total Custom Roles</span>
+<span class="font-bold">12</span>
+</div>
+<div class="flex justify-between items-center text-sm p-2 rounded bg-slate-50 dark:bg-slate-800">
+<span class="text-slate-600 dark:text-slate-400">Inherited Permissions</span>
+<span class="font-bold text-primary">Active</span>
+</div>
+</div>
+<button class="w-full mt-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                        Configure Permissions
+                    </button>
+</div>
+<!-- System Health Stats -->
+<div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-slate-900 dark:text-slate-100 font-bold">Security Settings</h4>
+<span class="material-symbols-outlined text-emerald-500">verified_user</span>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-center text-sm p-2 rounded bg-slate-50 dark:bg-slate-800">
+<span class="text-slate-600 dark:text-slate-400">2FA Enforcement</span>
+<span class="font-bold text-emerald-600">On</span>
+</div>
+<div class="flex justify-between items-center text-sm p-2 rounded bg-slate-50 dark:bg-slate-800">
+<span class="text-slate-600 dark:text-slate-400">Session Timeout</span>
+<span class="font-bold">15 mins</span>
+</div>
+</div>
+<button class="w-full mt-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                        Global Settings
+                    </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

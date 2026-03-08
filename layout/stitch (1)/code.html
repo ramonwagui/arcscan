@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Arcscan Document Center - AI Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1111d4",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101022",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex h-screen w-full flex-col overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="flex h-16 items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 shrink-0">
+<div class="flex items-center gap-4">
+<div class="text-primary">
+<svg class="size-8" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<div>
+<h2 class="text-lg font-bold leading-tight tracking-tight">Arcscan</h2>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest">Document Center</p>
+</div>
+</div>
+<div class="flex flex-1 justify-center max-w-2xl px-8">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary" placeholder="Semantic search across all documents..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined text-sm">upload_file</span>
+                    Upload
+                </button>
+<div class="h-8 w-[1px] bg-slate-200 dark:border-slate-800 mx-2"></div>
+<button class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="size-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden">
+<img class="size-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5Z1luj9wcxk_v62KJ9U7CMrzOqmR5puXpojO0dGLt2HgPZNE3cDZynDOD6emdD4BbVdTGnfVxVeGsNQ25slAW03GefZuATiNyp_X1b3ETSmH5zE12QI9dSLeEMi5PAkCpWXVjF7wCz7Lz08_PnrFYZ9sgO8PfCYypOXLnPfG3tqKNXCIJqEhhfH9-c0wmorr_xlIgjliPMZW8G6GYG_JZnPEpAS5qx7CKO6YX6MgghL9BdHiONKiHGfF0R7wweQqwXntS8oawymu1"/>
+</div>
+</div>
+</header>
+<!-- Main Content (Split View) -->
+<main class="flex flex-1 overflow-hidden">
+<!-- Sidebar Navigation -->
+<nav class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col gap-2">
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined fill-1">description</span>
+<span class="text-sm font-semibold">Documents</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="text-sm font-medium">Workspace</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-sm font-medium">Analytics</span>
+</div>
+<div class="mt-auto">
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</div>
+</div>
+</nav>
+<!-- Document List Section -->
+<section class="flex-1 flex flex-col bg-slate-50 dark:bg-background-dark/50 overflow-y-auto">
+<div class="p-6">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-xl font-bold">All Documents</h3>
+<div class="flex gap-2">
+<button class="p-2 border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+<button class="p-2 border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">view_module</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Document Card 1 -->
+<div class="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary transition-all cursor-pointer ring-primary/20 hover:ring-4">
+<div class="h-40 bg-slate-100 dark:bg-slate-800 relative">
+<div class="absolute inset-0 bg-cover bg-center opacity-80" data-alt="Thumbnail preview of annual report document" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAeUS0YYzHVmouMkjZn0PbUS9kf9P-I9wm4IfY6FBKqP0-1-Ds8IqXkZ8G3iw0dw2RA4XXIsHW_J3np42hlA9jpz_8RIeYqQcX20Zyql4hsyl-8f1UjVo5NsjkKTd7uOLof1nMhE-iIUz2Tizw18PZs4Jrfv-oqS_8mD17WPcceegJ_e5zwItubWCzzMxcO2HHX1xY9xV-9itR-N-M1GbLduVpVK9eRjB5VTzZNyL3a6vGeCJqO5tSe811h90TFbUuC8g8WAnrugtQV');"></div>
+<div class="absolute top-2 right-2">
+<span class="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] font-bold rounded uppercase">Processed</span>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-semibold text-sm truncate">Annual Report 2023.pdf</h4>
+<div class="flex items-center gap-2 mt-2">
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] rounded">Financial</span>
+<span class="text-[10px] text-slate-400">Jan 12, 2024</span>
+</div>
+</div>
+</div>
+<!-- Document Card 2 -->
+<div class="bg-white dark:bg-slate-900 border border-primary dark:border-primary rounded-xl overflow-hidden cursor-pointer ring-4 ring-primary/10">
+<div class="h-40 bg-slate-100 dark:bg-slate-800 relative">
+<div class="absolute inset-0 bg-cover bg-center opacity-80" data-alt="Technical specification document thumbnail" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBkJNbDKeQLWfaLTzbgCwR8wJEwlnLEnu_wmKEW1oa0MS8vpapU5lffL7kKFRU305N8pQInYXF3SgQJsj8fxQsVIjgq0gMIcbouLJ_bZKnqwCjTMkhSH4Z8sYZTGyBjIH8vSCVipVFcVvsSL9sz_M6kxOjrmO9EftY27Gz_Fvxe5FS4NNyc8IJYt2QzlLwP1XItfbM4FsNd0mkbhKZ2xh3wVnPGJVse_tEUUboPMGD395blivfbWHDjkJ9_SpUYU1cDSxiE_eZD9-ZT');"></div>
+<div class="absolute top-2 right-2">
+<span class="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] font-bold rounded uppercase">Pending</span>
+</div>
+<div class="absolute inset-0 flex items-center justify-center bg-primary/20">
+<span class="material-symbols-outlined text-primary text-4xl">visibility</span>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-semibold text-sm truncate text-primary">Project Alpha Specs.docx</h4>
+<div class="flex items-center gap-2 mt-2">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] rounded">Technical</span>
+<span class="text-[10px] text-slate-400">Jan 10, 2024</span>
+</div>
+</div>
+</div>
+<!-- Document Card 3 -->
+<div class="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary transition-all cursor-pointer ring-primary/20 hover:ring-4">
+<div class="h-40 bg-slate-100 dark:bg-slate-800 relative">
+<div class="absolute inset-0 bg-cover bg-center opacity-80" data-alt="Market analysis research document thumbnail" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCXufz422d1iRwdEcA0sEAHD7x9kJ4QXJNGwaKfM0rmQdTcPdyFUZVzJR8mDl887jsDw0ll5lZRjTCo2X2BLicCkAltG3e53yz56_yEO4BdyruI8ly3vvPJ-MVkwFqVJZe9zqtjFCNoOKfOD9OV31WugPIyPzOm5KVQxbyK5i2OiAZsWu7S-nbpxuPEx_kvfSYMbHOUnzPBWHp1JhLLh2125MVOPaRzIylHoNHcsskQtGtVJ_Wj5UbvbRzPOlcszh2hzeE6wmWhxEv5');"></div>
+<div class="absolute top-2 right-2">
+<span class="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] font-bold rounded uppercase">Processed</span>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-semibold text-sm truncate">Market Analysis.pdf</h4>
+<div class="flex items-center gap-2 mt-2">
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] rounded">Research</span>
+<span class="text-[10px] text-slate-400">Jan 05, 2024</span>
+</div>
+</div>
+</div>
+<!-- Document Card 4 -->
+<div class="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary transition-all cursor-pointer ring-primary/20 hover:ring-4">
+<div class="h-40 bg-slate-100 dark:bg-slate-800 relative">
+<div class="absolute inset-0 bg-cover bg-center opacity-80" data-alt="Legal contract document thumbnail" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDN7PXIaju0KvDCUvK2619l-qb0-8hQumW3m32J-Pw_8VhOdtvHObbmb8pCfnqN1o0kukDwoglf4gCQSOAHMa--lqOleOy2eqCBzk7QNQZ9nhUXpxZlu5oYTyagaBecoItD33cQyM27LkctnNlw7s-4v5b9xBTOcd4Iqltuja_9fecN2VQjevUiEI8YDFFyRikB-COKsPBunXxddbe0CoK7LC_b9fOl0-KHbJ4bs5JyTfuHrAG5BUZD3ZBpriTWLzAs4euWp1bT9i2o');"></div>
+<div class="absolute top-2 right-2">
+<span class="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] font-bold rounded uppercase">Processed</span>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-semibold text-sm truncate">Contract_V2.pdf</h4>
+<div class="flex items-center gap-2 mt-2">
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] rounded">Legal</span>
+<span class="text-[10px] text-slate-400">Jan 02, 2024</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- AI Chat Assistant Section (Persistent Side Panel) -->
+<aside class="w-[400px] border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0 shadow-2xl z-10">
+<!-- Chat Header -->
+<div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="size-8 rounded-lg bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl">smart_toy</span>
+</div>
+<div>
+<h3 class="font-bold text-sm">AI Assistant</h3>
+<div class="flex items-center gap-1.5">
+<div class="size-2 rounded-full bg-green-500"></div>
+<p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Analyzing: Project Alpha Specs</p>
+</div>
+</div>
+</div>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Chat Messages Area -->
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
+<!-- Bot Message -->
+<div class="flex gap-3">
+<div class="size-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-sm">smart_toy</span>
+</div>
+<div class="bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-tl-none p-3 max-w-[85%]">
+<p class="text-xs leading-relaxed">Hello! I've indexed <strong>Project Alpha Specs.docx</strong>. What would you like to know about the technical requirements or deadlines mentioned in the document?</p>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-3 justify-end">
+<div class="bg-primary text-white rounded-2xl rounded-tr-none p-3 max-w-[85%] shadow-md shadow-primary/20">
+<p class="text-xs leading-relaxed">What is the proposed budget for Phase 1?</p>
+</div>
+</div>
+<!-- Bot Message -->
+<div class="flex gap-3">
+<div class="size-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-sm">smart_toy</span>
+</div>
+<div class="bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-tl-none p-3 max-w-[85%]">
+<p class="text-xs leading-relaxed mb-2">According to section 4.2 (Financial Projections), the proposed budget for Phase 1 is <strong>$145,000</strong>. This covers:</p>
+<ul class="text-[11px] list-disc ml-4 space-y-1 opacity-90">
+<li>Infrastructure setup ($45k)</li>
+<li>Initial R&amp;D ($60k)</li>
+<li>Quality Assurance ($40k)</li>
+</ul>
+<div class="mt-3 pt-2 border-t border-slate-200 dark:border-slate-700 flex gap-2 overflow-x-auto">
+<button class="whitespace-nowrap px-2 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded text-[10px] font-medium hover:bg-slate-50">Compare to Phase 2</button>
+<button class="whitespace-nowrap px-2 py-1 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded text-[10px] font-medium hover:bg-slate-50">View Source</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Chat Input Area -->
+<div class="p-4 border-t border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-3">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Quick Queries:</span>
+<div class="flex gap-1">
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-[10px] cursor-pointer hover:bg-primary/5 hover:border-primary/30 transition-colors">Summarize</span>
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-[10px] cursor-pointer hover:bg-primary/5 hover:border-primary/30 transition-colors">Find Dates</span>
+</div>
+</div>
+<div class="relative">
+<textarea class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl py-3 pl-4 pr-12 text-xs resize-none focus:ring-2 focus:ring-primary h-12 flex items-center" placeholder="Ask a question about this document..." rows="1"></textarea>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 size-8 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-primary/90">
+<span class="material-symbols-outlined text-lg">send</span>
+</button>
+</div>
+<p class="text-[9px] text-center text-slate-400 mt-2">AI-generated content may be inaccurate. Verify important details.</p>
+</div>
+</aside>
+</main>
+</div>
+</body></html>

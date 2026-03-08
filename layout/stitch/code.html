@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1111d4",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101022",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-size: 24px; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col">
+<div class="p-6">
+<div class="flex items-center gap-3">
+<div class="bg-primary size-10 rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-none">Arcscan</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Executive Portal</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="text-sm font-medium">Documents</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="text-sm font-medium">AI Assistant</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">shield</span>
+<span class="text-sm font-medium">Auditory</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 p-2">
+<div class="size-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile avatar silhouette" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnNgoK9ULTuwQ28bOuUShlvMMqgAN3N2QC8Rs-S8wWCUOUQzfmvEqsHnj2BcY68nNF6R5wxcCrmYTkPnCiUAfgKmsln0SG0vsWFv3n-C8YAuLtrMIot78CNFDJDotxkmMWzRGlsl8S0QW8UUGoSxMC1ZFwmzcAmRqe-FnNBTdgVzcGVVncEZxcT1L_g-Ebq-o7g9l0C3nIFDwmFpyJHKLN75rcUuen3JQ2BKAkpp9rBrpgFRA2WpiQEmBQpM5ajaexqrQFeHYEyhhg"/>
+</div>
+<div class="flex flex-col">
+<p class="text-xs font-bold">Admin User</p>
+<p class="text-[10px] text-slate-500">Premium Account</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-y-auto">
+<!-- Top Header -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-8">
+<h2 class="text-xl font-bold tracking-tight">Executive Dashboard</h2>
+<div class="flex items-center gap-4">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-slate-400">search</span>
+<input class="pl-10 pr-4 py-1.5 rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-primary focus:border-primary w-64" placeholder="Search analytics..." type="text"/>
+</div>
+<button class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+</button>
+<button class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-8 space-y-8">
+<!-- Header Stats -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Processed</p>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">description</span>
+</div>
+<div class="mt-4">
+<h3 class="text-2xl font-bold tracking-tight">1,284,092</h3>
+<p class="text-emerald-600 text-xs font-semibold mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span> +12.5% from last month
+                        </p>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Processing Rate</p>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">speed</span>
+</div>
+<div class="mt-4">
+<h3 class="text-2xl font-bold tracking-tight">94.2%</h3>
+<p class="text-emerald-600 text-xs font-semibold mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span> +2.1% efficiency
+                        </p>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">System Uptime</p>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">cloud_done</span>
+</div>
+<div class="mt-4">
+<h3 class="text-2xl font-bold tracking-tight">99.9%</h3>
+<p class="text-rose-600 text-xs font-semibold mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_down</span> -0.01% drift
+                        </p>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Active Workers</p>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">memory</span>
+</div>
+<div class="mt-4">
+<h3 class="text-2xl font-bold tracking-tight">42 / 50</h3>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 mt-3 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 84%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Bar Chart: Document Types -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h4 class="font-bold text-lg">Documents by Type</h4>
+<p class="text-slate-500 text-sm">Volume distribution per category</p>
+</div>
+<select class="bg-slate-50 dark:bg-slate-800 border-none text-xs rounded-lg px-2 py-1">
+<option>Last 30 Days</option>
+<option>Last 7 Days</option>
+</select>
+</div>
+<div class="h-64 flex items-end justify-between gap-4 px-2">
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-primary/20 hover:bg-primary transition-colors rounded-t-lg relative" style="height: 85%">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">142k</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase">Contracts</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-primary/20 hover:bg-primary transition-colors rounded-t-lg relative" style="height: 60%">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">98k</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase">Invoices</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-primary/20 hover:bg-primary transition-colors rounded-t-lg relative" style="height: 95%">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">180k</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase">NDAs</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-primary/20 hover:bg-primary transition-colors rounded-t-lg relative" style="height: 40%">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">52k</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase">PO</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-primary/20 hover:bg-primary transition-colors rounded-t-lg relative" style="height: 70%">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">110k</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase">Others</span>
+</div>
+</div>
+</div>
+<!-- Approval Status Section -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h4 class="font-bold text-lg mb-2">Approval Pipeline</h4>
+<p class="text-slate-500 text-sm mb-8">Current status of pending queue</p>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-semibold">Approved</span>
+<span class="text-sm font-bold text-emerald-600">8,420 (68%)</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full rounded-full" style="width: 68%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-semibold">Pending Review</span>
+<span class="text-sm font-bold text-amber-600">3,110 (24%)</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+<div class="bg-amber-500 h-full rounded-full" style="width: 24%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-semibold">Rejected / Flagged</span>
+<span class="text-sm font-bold text-rose-600">970 (8%)</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+<div class="bg-rose-500 h-full rounded-full" style="width: 8%"></div>
+</div>
+</div>
+</div>
+<div class="mt-10 pt-6 border-t border-slate-100 dark:border-slate-800 grid grid-cols-3 gap-4 text-center">
+<div>
+<p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Avg Time</p>
+<p class="text-lg font-bold">14.2m</p>
+</div>
+<div>
+<p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Accuracy</p>
+<p class="text-lg font-bold">99.2%</p>
+</div>
+<div>
+<p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Manual Req</p>
+<p class="text-lg font-bold">5.8%</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Notifications / Alerts Section -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+<!-- Notifications List -->
+<div class="xl:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<h4 class="font-bold text-lg">System Events</h4>
+<button class="text-primary text-xs font-bold hover:underline">Mark all as read</button>
+</div>
+<div class="space-y-4">
+<div class="flex gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 transition-all hover:translate-x-1">
+<div class="p-2 h-fit bg-emerald-100 text-emerald-600 rounded-lg">
+<span class="material-symbols-outlined">verified</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<p class="text-sm font-bold">Batch PRJ-2024 Processing Complete</p>
+<span class="text-[10px] text-slate-500">2 mins ago</span>
+</div>
+<p class="text-xs text-slate-600 dark:text-slate-400 mt-1">All 1,200 invoices from Northern Branch were verified without errors.</p>
+</div>
+</div>
+<div class="flex gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 transition-all hover:translate-x-1">
+<div class="p-2 h-fit bg-amber-100 text-amber-600 rounded-lg">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<p class="text-sm font-bold">High Sentiment Deviation Flagged</p>
+<span class="text-[10px] text-slate-500">45 mins ago</span>
+</div>
+<p class="text-xs text-slate-600 dark:text-slate-400 mt-1">AI Assistant flagged unusual clauses in 3 pending Service Level Agreements.</p>
+</div>
+</div>
+<div class="flex gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 transition-all hover:translate-x-1">
+<div class="p-2 h-fit bg-blue-100 text-blue-600 rounded-lg">
+<span class="material-symbols-outlined">refresh</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<p class="text-sm font-bold">Database Sync Optimization</p>
+<span class="text-[10px] text-slate-500">3 hours ago</span>
+</div>
+<p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Weekly maintenance completed. Query performance improved by 14%.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Expiring Soon Alerts -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h4 class="font-bold text-lg mb-6">Expiring Soon</h4>
+<div class="space-y-4">
+<div class="p-4 border-l-4 border-rose-500 bg-rose-50 dark:bg-rose-900/10 rounded-r-lg">
+<div class="flex justify-between items-start">
+<p class="text-xs font-bold text-rose-800 dark:text-rose-400">Security Certificate</p>
+<span class="px-1.5 py-0.5 bg-rose-200 text-rose-800 text-[10px] font-bold rounded">2 days left</span>
+</div>
+<p class="text-[11px] mt-1 text-rose-700/80 dark:text-rose-400/80">SSL certificate for document-storage.arcscan.io requires immediate renewal.</p>
+</div>
+<div class="p-4 border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-900/10 rounded-r-lg">
+<div class="flex justify-between items-start">
+<p class="text-xs font-bold text-amber-800 dark:text-amber-400">AWS Reserved Instances</p>
+<span class="px-1.5 py-0.5 bg-amber-200 text-amber-800 text-[10px] font-bold rounded">5 days left</span>
+</div>
+<p class="text-[11px] mt-1 text-amber-700/80 dark:text-amber-400/80">Compute reserved nodes are expiring. Review pricing tier updates.</p>
+</div>
+<div class="p-4 border-l-4 border-slate-300 bg-slate-50 dark:bg-slate-800 rounded-r-lg">
+<div class="flex justify-between items-start">
+<p class="text-xs font-bold">Service License (Pro)</p>
+<span class="px-1.5 py-0.5 bg-slate-200 text-slate-800 text-[10px] font-bold rounded">12 days left</span>
+</div>
+<p class="text-[11px] mt-1 text-slate-500">Enterprise seat license for Auditory module auto-renews soon.</p>
+</div>
+</div>
+<button class="w-full mt-6 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                        View All Alerts
+                    </button>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="p-8 mt-auto text-center border-t border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50">
+<p class="text-xs text-slate-400">© 2024 Arcscan Technologies Inc. All rights reserved. System Status: <span class="text-emerald-500 font-bold">Operational</span></p>
+</footer>
+</main>
+</div>
+</body></html>
