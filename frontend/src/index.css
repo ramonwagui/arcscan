@@ -13,12 +13,12 @@
   }
 
   body {
-    @apply bg-[#fcfcfd] text-slate-900 font-sans antialiased transition-colors duration-300;
+    @apply bg-white text-slate-900 font-sans antialiased transition-colors duration-300;
     min-height: 100vh;
   }
 
   body.dark {
-    @apply bg-surface-900 text-slate-100;
+    @apply bg-white text-slate-900;
   }
 
   ::-webkit-scrollbar {

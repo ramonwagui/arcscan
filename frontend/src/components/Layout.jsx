@@ -30,7 +30,7 @@ export default function Layout() {
         : user?.email?.[0]?.toUpperCase() || 'U'
 
     return (
-        <div className="min-h-screen flex bg-[#fcfcfd] dark:bg-surface-950 transition-colors duration-500 font-sans selection:bg-primary-500/30">
+        <div className="min-h-screen flex bg-white dark:bg-white transition-colors duration-500 font-sans selection:bg-primary-500/30">
             {/* Sidebar overlay (mobile) */}
             {sidebarOpen && (
                 <div
