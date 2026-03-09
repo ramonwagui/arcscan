@@ -12,6 +12,12 @@ export default function AdminPage() {
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(true)
 
+    // Form state para categorias
+    const [showCatForm, setShowCatForm] = useState(false)
+    const [editingCat, setEditingCat] = useState(null)
+    const [catForm, setCatForm] = useState({ slug: '', name: '', color: 'bg-slate-700/20 text-slate-300 border-slate-600/30' })
+
+    // Form state para usuários
     const [showUserForm, setShowUserForm] = useState(false)
     const [editingUser, setEditingUser] = useState(null)
     const [userForm, setUserForm] = useState({ email: '', name: '', password: '', role: 'user' })
