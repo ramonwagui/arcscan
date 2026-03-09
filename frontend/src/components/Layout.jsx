@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import {
     LayoutDashboard, FileText, Search, Upload, LogOut,
-    Menu, X, Building2, ChevronRight, Bell, Shield, Settings
+    Menu, X, Building2, ChevronRight, Bell, Shield, Settings, User
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
