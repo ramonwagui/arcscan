@@ -112,8 +112,11 @@ export const usersApi = {
     list: () =>
         api.get('/api/users').then(r => r.data),
 
-    invite: (email) =>
-        api.post('/api/users', { email }).then(r => r.data),
+    create: (data) =>
+        api.post('/api/users', data).then(r => r.data),
+
+    update: (id, data) =>
+        api.put(`/api/users/${id}`, data).then(r => r.data),
 
     updateRole: (id, role) =>
         api.patch(`/api/users/${id}/role`, { role }).then(r => r.data),

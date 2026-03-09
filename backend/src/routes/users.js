@@ -34,34 +34,88 @@ router.get('/', async (req, res, next) => {
     }
 });
 
-// POST /api/users - Convida um novo usuário por e-mail
+// POST /api/users - Cria um novo usuário com senha e permissões
 router.post('/', async (req, res, next) => {
     try {
-        const { email } = req.body;
+        const { email, password, name, role } = req.body;
 
-        if (!email) {
-            return res.status(400).json({ error: 'E-mail é obrigatório' });
+        if (!email || !password) {
+            return res.status(400).json({ error: 'E-mail e senha são obrigatórios' });
         }
+
+        const userRole = ['superadmin', 'user'].includes(role) ? role : 'user';
 
         if (!supabase) {
-            return res.status(201).json({ message: 'Convite simulado enviado para ' + email });
+            return res.status(201).json({ message: 'Criação simulada para ' + email });
         }
 
-        // Envia o convite via Supabase Auth Admin
-        const { data, error } = await supabase.auth.admin.inviteUserByEmail(email);
+        // Cria o usuário via Supabase Auth Admin
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+            email,
+            password,
+            email_confirm: true, // Auto-confirma o email
+            user_metadata: { name }
+        });
 
-        if (error) throw error;
+        if (authError) throw authError;
+
+        // Atualiza a role na tabela profiles (geralmente criada por trigger, mas garantimos aqui)
+        if (authData.user) {
+            await supabase
+                .from('profiles')
+                .update({ role: userRole })
+                .eq('id', authData.user.id);
+        }
 
         res.status(201).json({
-            message: 'Convite enviado com sucesso para ' + email,
-            user: data.user
+            message: 'Usuário criado com sucesso',
+            user: authData.user
         });
     } catch (err) {
         next(err);
     }
 });
 
-// PATCH /api/users/:id/role - Atualiza cargo (role) do usuário
+// PUT /api/users/:id - Atualiza dados do usuário (senha, nome, role)
+router.put('/:id', async (req, res, next) => {
+    try {
+        const { name, password, role } = req.body;
+        const userId = req.params.id;
+
+        if (!supabase) {
+            return res.json({ id: userId, message: 'Atualização simulada' });
+        }
+
+        const authUpdates = {};
+        if (password) authUpdates.password = password;
+        if (name) authUpdates.user_metadata = { name };
+
+        // Atualiza Auth se necessário
+        if (Object.keys(authUpdates).length > 0) {
+            const { error: authError } = await supabase.auth.admin.updateUserById(
+                userId,
+                authUpdates
+            );
+            if (authError) throw authError;
+        }
+
+        // Atualiza Role na tabela profiles se fornecido
+        if (role && ['superadmin', 'user'].includes(role)) {
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({ role })
+                .eq('id', userId);
+
+            if (profileError) throw profileError;
+        }
+
+        res.json({ message: 'Usuário atualizado com sucesso' });
+    } catch (err) {
+        next(err);
+    }
+});
+
+// PATCH /api/users/:id/role - Atualiza apenas o cargo (role) do usuário (mantido para compatibilidade)
 router.patch('/:id/role', async (req, res, next) => {
     try {
         const { role } = req.body;

@@ -54,7 +54,6 @@ export default function App() {
             <Routes>
                 {/* Rotas públicas */}
                 <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-                <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
 
                 {/* Rotas privadas */}
                 <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
