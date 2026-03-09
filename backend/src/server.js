@@ -27,25 +27,8 @@ process.on('uncaughtException', (err) => {
 app.use(helmet());
 
 // CORS
-const allowedOrigins = [
-  (process.env.FRONTEND_URL || 'http://localhost:5173').trim().replace(/\/$/, ''),
-  'http://localhost:5173'
-];
-
 app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    const normalizedOrigin = origin.trim().replace(/\/$/, '');
-    if (allowedOrigins.indexOf(normalizedOrigin) !== -1) {
-      callback(null, true);
-    } else {
-      console.log('[CORS] Origin bloqueada:', origin);
-      console.log('[CORS] Origins permitidas:', allowedOrigins);
-      callback(new Error('Não permitido pelo CORS'));
-    }
-  },
+  origin: true,
   credentials: true,
 }));
 
