@@ -53,6 +53,12 @@ Login with: `demo@docsearch.local` / `demo123`
 - Info cards use `bg-primary-50` with `border-primary-100` instead of dark backgrounds
 - Buttons use `bg-primary-500` instead of `bg-slate-900`
 
+## Branding
+- Subtitle: "Neural Engine Documents Scan" (updated from "Neural Engine")
+- Logo: NC Convênios logo at `/frontend/public/logo.png` — displayed on login page (centered) and sidebar header
+- Copyright: Dynamic year via `new Date().getFullYear()` — auto-updates each year
+- Login page: Centered layout, no registration link
+
 ## Replit Configuration Notes
 - Frontend uses `host: '0.0.0.0'` and `allowedHosts: true` for Replit proxy compatibility
 - Vite proxies `/api/*` requests to `http://localhost:3001`

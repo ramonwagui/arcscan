@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import {
     LayoutDashboard, FileText, Search, Upload, LogOut,
-    Menu, X, Building2, ChevronRight, Bell, Shield, Settings, User
+    Menu, X, Bell, Shield, Settings, User
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
@@ -44,15 +44,11 @@ export default function Layout() {
                 ${sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
                 lg:translate-x-0 lg:static lg:z-auto
             `}>
-                <div className="px-8 py-10 flex items-center gap-4">
-                    <div className="relative group">
-                        <div className="relative w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center text-white shadow-md">
-                            <Search size={20} strokeWidth={2.5} className="group-hover:scale-110 transition-transform duration-500" />
-                        </div>
-                    </div>
+                <div className="px-8 py-8 flex items-center gap-4">
+                    <img src="/logo.png" alt="NC Convênios" className="h-14 w-auto object-contain" />
                     <div>
                         <h1 className="text-2xl font-black text-slate-900 leading-none tracking-tighter">Arcscan</h1>
-                        <p className="text-[10px] font-black text-primary-500 uppercase tracking-[0.3em] mt-1.5 opacity-80">Neural Engine</p>
+                        <p className="text-[10px] font-black text-primary-500 uppercase tracking-[0.2em] mt-1.5 opacity-80 leading-tight">Neural Engine<br />Documents Scan</p>
                     </div>
                 </div>
 
