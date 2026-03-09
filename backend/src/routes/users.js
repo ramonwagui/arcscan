@@ -22,13 +22,30 @@ router.get('/', async (req, res, next) => {
             return res.json([{ id: 'mock', email: 'mock@test.com', role: 'superadmin', created_at: new Date() }]);
         }
 
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .order('created_at', { ascending: false });
+        // Obtém a lista real do Auth (para ter o user_metadata com o nome)
+        const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+        if (authError) throw authError;
 
-        if (error) throw error;
-        res.json(data);
+        // Obtém a tabela auxiliar de perfis
+        const { data: profiles, error: profileError } = await supabase
+            .from('profiles')
+            .select('*');
+
+        if (profileError) throw profileError;
+
+        // Combina os dados
+        const combined = authUsers.users.map(u => {
+            const profile = profiles.find(p => p.id === u.id);
+            return {
+                ...u,
+                role: profile ? profile.role : 'user'
+            };
+        });
+
+        // Ordena por data de criação mais recente
+        combined.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        res.json(combined);
     } catch (err) {
         next(err);
     }

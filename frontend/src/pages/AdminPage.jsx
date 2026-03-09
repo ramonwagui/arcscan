@@ -311,15 +311,23 @@ export default function AdminPage() {
                                         <tbody className="divide-y divide-slate-50">
                                             {users.map(u => (
                                                 <tr key={u.id} className="group hover:bg-slate-50 transition-all">
-                                                    <td className="py-5 px-8">
+                                                    <td className="px-6 py-4">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-black uppercase text-slate-500">
-                                                                {u.email.substring(0, 2)}
+                                                            <div className="w-8 h-8 rounded-full bg-slate-800 text-slate-100 flex items-center justify-center text-xs font-bold leading-none tracking-wider">
+                                                                {u.role === 'superadmin' ? 'RA' : 'RO'}
                                                             </div>
-                                                            <div className="flex flex-col">
-                                                                <span className="text-sm font-black text-slate-900 tracking-tight">{u.raw_user_meta_data?.name || 'Desconhecido'}</span>
-                                                                <span className="text-[10px] font-bold text-slate-500 tracking-tight">{u.email}</span>
-                                                                {u.id === user.id && <span className="text-[9px] font-black text-primary-500 uppercase tracking-widest mt-0.5">Sessão Atual</span>}
+                                                            <div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-sm font-black text-slate-900 tracking-tight">{u.user_metadata?.name || u.raw_user_meta_data?.name || 'Desconhecido'}</span>
+                                                                </div>
+                                                                <div className="text-xs text-slate-500 font-medium">
+                                                                    {u.email}
+                                                                    {u.id === user.id && (
+                                                                        <span className="ml-2 text-[10px] font-black tracking-widest text-primary-600 uppercase">
+                                                                            Sessão Atual
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </td>

@@ -53,17 +53,25 @@ export function AuthProvider({ children }) {
             }
         }
 
+        const getStoredRole = () => {
+            try {
+                const stored = localStorage.getItem('docsearch_user')
+                if (stored) return JSON.parse(stored).role || 'user'
+            } catch { }
+            return 'user'
+        }
+
         const initializeAuth = async () => {
             try {
                 const { data: { session } } = await supabase.auth.getSession()
                 if (session) {
-                    // Define o usuário básico imediatamente para liberar o Loading
+                    // Define o usuário básico imediatamente para liberar o Loading, preservando a Role se houver
                     const basicUser = {
                         id: session.user.id,
                         email: session.user.email,
                         name: session.user.user_metadata?.name || session.user.email,
                         organization: session.user.user_metadata?.organization || '',
-                        role: 'user' // Default até carregar o real
+                        role: getStoredRole()
                     }
                     setUser(basicUser)
                     localStorage.setItem('docsearch_token', session.access_token)
@@ -83,13 +91,13 @@ export function AuthProvider({ children }) {
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (session) {
-                if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+                if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
                     const basicUser = {
                         id: session.user.id,
                         email: session.user.email,
                         name: session.user.user_metadata?.name || session.user.email,
                         organization: session.user.user_metadata?.organization || '',
-                        role: 'user'
+                        role: getStoredRole()
                     }
                     setUser(basicUser)
                     localStorage.setItem('docsearch_token', session.access_token)
