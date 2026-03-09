@@ -46,6 +46,13 @@ DocSearch is a SaaS document management system with automatic OCR and text searc
 ## Demo Mode
 Login with: `demo@docsearch.local` / `demo123`
 
+## Theme
+- Light-only theme with soft, pastel colors
+- Primary palette: soft indigo/purple (#7b8ff2 base)
+- No dark mode — all `dark:` classes have been removed
+- Info cards use `bg-primary-50` with `border-primary-100` instead of dark backgrounds
+- Buttons use `bg-primary-500` instead of `bg-slate-900`
+
 ## Replit Configuration Notes
 - Frontend uses `host: '0.0.0.0'` and `allowedHosts: true` for Replit proxy compatibility
 - Vite proxies `/api/*` requests to `http://localhost:3001`

@@ -12,26 +12,26 @@ function FilePreview({ file, onRemove }) {
     const url = isImage ? URL.createObjectURL(file) : null
 
     return (
-        <div className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 shadow-sm animate-fade-in group">
+        <div className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm animate-fade-in group">
             <div className="relative">
                 {url ? (
-                    <img src={url} alt="" className="w-16 h-16 rounded-xl object-cover border border-slate-100 dark:border-slate-800 shadow-sm" />
+                    <img src={url} alt="" className="w-16 h-16 rounded-xl object-cover border border-slate-100 shadow-sm" />
                 ) : (
-                    <div className="w-16 h-16 rounded-xl bg-primary-50 dark:bg-primary-500/10 border border-primary-100 dark:border-primary-500/20 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-xl bg-primary-50 border border-primary-100 flex items-center justify-center">
                         <FileText size={24} className="text-primary-500" />
                     </div>
                 )}
                 <div className="absolute -top-2 -right-2">
                     <button
                         onClick={onRemove}
-                        className="w-6 h-6 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-lg hover:bg-rose-600 transition-colors border-2 border-white dark:border-surface-900"
+                        className="w-6 h-6 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-lg hover:bg-rose-600 transition-colors border-2 border-white"
                     >
                         <X size={12} strokeWidth={3} />
                     </button>
                 </div>
             </div>
             <div className="flex-1 min-w-0">
-                <p className="text-sm font-black text-slate-900 dark:text-white truncate uppercase tracking-tight">{file.name}</p>
+                <p className="text-sm font-black text-slate-900 truncate uppercase tracking-tight">{file.name}</p>
                 <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">{(file.size / 1024).toFixed(1)} KB • {file.type.split('/')[1].toUpperCase()}</p>
             </div>
         </div>
@@ -115,10 +115,10 @@ export default function UploadPage() {
                 <div className="w-20 h-20 bg-primary-500 rounded-[2rem] flex items-center justify-center text-white mx-auto mb-6 shadow-xl shadow-primary-500/20 animate-bounce-slow">
                     <Upload size={32} strokeWidth={2.5} />
                 </div>
-                <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
+                <h1 className="text-4xl font-black text-slate-900 tracking-tight uppercase">
                     Central de <span className="text-primary-500">Captura</span>
                 </h1>
-                <p className="text-slate-500 dark:text-slate-400 font-bold text-sm mt-4 uppercase tracking-[0.2em]">
+                <p className="text-slate-500 font-bold text-sm mt-4 uppercase tracking-[0.2em]">
                     Inteligência Artificial & Extração de Metadados
                 </p>
             </div>
@@ -128,8 +128,8 @@ export default function UploadPage() {
                 <div className="lg:col-span-7 space-y-8">
                     <div
                         className={`relative group rounded-[2.5rem] border-4 border-dashed transition-all duration-500 flex flex-col items-center justify-center p-12 text-center
-                            ${dragOver ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-500/5 scale-[1.02]' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-surface-900'}
-                            ${file ? 'border-emerald-500/30 bg-emerald-50/10 dark:bg-emerald-500/5' : ''}
+                            ${dragOver ? 'border-primary-500 bg-primary-50/50 scale-[1.02]' : 'border-slate-200 bg-white'}
+                            ${file ? 'border-emerald-500/30 bg-emerald-50/10' : ''}
                         `}
                         onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
                         onDragLeave={() => setDragOver(false)}
@@ -146,15 +146,15 @@ export default function UploadPage() {
 
                         {!file ? (
                             <>
-                                <div className="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-surface-950 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-primary-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                                <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-primary-500 group-hover:text-white transition-all duration-300 shadow-sm">
                                     <Upload size={28} strokeWidth={2.5} className="text-slate-400 group-hover:text-white" />
                                 </div>
-                                <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight mb-2">Arraste seus Arquivos</h3>
+                                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Arraste seus Arquivos</h3>
                                 <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mb-8">Clique para explorar ou solte aqui</p>
 
                                 <div className="flex flex-wrap justify-center gap-3">
                                     {['PDF', 'JPG', 'PNG'].map(type => (
-                                        <span key={type} className="px-4 py-2 rounded-xl bg-slate-50 dark:bg-surface-950 text-[10px] font-black text-slate-400 border border-slate-100 dark:border-slate-800 uppercase tracking-widest group-hover:border-primary-500/20 transition-all">
+                                        <span key={type} className="px-4 py-2 rounded-xl bg-slate-50 text-[10px] font-black text-slate-400 border border-slate-100 uppercase tracking-widest group-hover:border-primary-500/20 transition-all">
                                             {type} format
                                         </span>
                                     ))}
@@ -180,16 +180,16 @@ export default function UploadPage() {
 
                     {/* Progress indicator */}
                     {uploading && (
-                        <div className="p-8 bg-white dark:bg-surface-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm animate-fade-in">
+                        <div className="p-8 bg-white rounded-[2rem] border border-slate-200 shadow-sm animate-fade-in">
                             <div className="flex justify-between items-end mb-4">
                                 <div>
                                     <p className="text-[10px] font-black text-primary-500 uppercase tracking-[0.2em]">Upload em curso</p>
-                                    <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-tight leading-none mt-1">Sincronizando com a Nuvem</h4>
+                                    <h4 className="text-lg font-black text-slate-900 tracking-tight leading-none mt-1">Sincronizando com a Nuvem</h4>
                                 </div>
                                 <span className="text-xl font-black text-primary-500">{progress}%</span>
                             </div>
-                            <div className="w-full bg-slate-100 dark:bg-surface-950 h-3 rounded-full overflow-hidden">
-                                <div className="bg-primary-500 h-full rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(17,17,212,0.4)]" style={{ width: `${progress}%` }}></div>
+                            <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+                                <div className="bg-primary-500 h-full rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(123,143,242,0.3)]" style={{ width: `${progress}%` }}></div>
                             </div>
                         </div>
                     )}
@@ -197,10 +197,10 @@ export default function UploadPage() {
 
                 {/* Right side: Metadata Forms */}
                 <div className="lg:col-span-5 space-y-6">
-                    <div className="bg-white dark:bg-surface-900 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm space-y-8">
+                    <div className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm space-y-8">
                         {/* Title input */}
                         <div>
-                            <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 block">Nome de Identificação</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Nome de Identificação</label>
                             <input
                                 type="text"
                                 className="input h-14 px-6 rounded-2xl text-sm font-bold placeholder:font-normal"
@@ -213,7 +213,7 @@ export default function UploadPage() {
 
                         {/* Expiration date */}
                         <div>
-                            <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 block">Validade do Documento</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Validade do Documento</label>
                             <div className="relative">
                                 <input
                                     type="date"
@@ -229,7 +229,7 @@ export default function UploadPage() {
 
                         {/* Category selection grid */}
                         <div>
-                            <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 block">Classificação Inteligente</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 block">Classificação Inteligente</label>
                             <div className="grid grid-cols-2 gap-3">
                                 {dbCategories.map(cat => (
                                     <button
@@ -239,16 +239,16 @@ export default function UploadPage() {
                                         className={`p-4 rounded-2xl border-2 text-left transition-all duration-300 flex flex-col gap-2 relative overflow-hidden group
                                             ${category === cat.slug
                                                 ? 'border-primary-500 bg-primary-500/5 shadow-lg shadow-primary-500/5'
-                                                : 'border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700'}
+                                                : 'border-slate-100 hover:border-slate-200'}
                                         `}
                                     >
                                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors
-                                            ${category === cat.slug ? 'bg-primary-500 text-white' : 'bg-slate-50 dark:bg-surface-950 text-slate-400 group-hover:text-primary-500'}
+                                            ${category === cat.slug ? 'bg-primary-500 text-white' : 'bg-slate-50 text-slate-400 group-hover:text-primary-500'}
                                         `}>
                                             <Tag size={16} strokeWidth={2.5} />
                                         </div>
                                         <span className={`text-[11px] font-black uppercase tracking-tight
-                                            ${category === cat.slug ? 'text-primary-500' : 'text-slate-600 dark:text-slate-400'}
+                                            ${category === cat.slug ? 'text-primary-500' : 'text-slate-600'}
                                         `}>
                                             {cat.name}
                                         </span>
@@ -264,7 +264,7 @@ export default function UploadPage() {
 
                         {/* Error and actions */}
                         {error && (
-                            <div className="flex items-center gap-3 p-4 rounded-2xl bg-rose-50 dark:bg-rose-500/5 border border-rose-100 dark:border-rose-500/20 text-rose-500 animate-shake">
+                            <div className="flex items-center gap-3 p-4 rounded-2xl bg-rose-50 border border-rose-100 text-rose-500 animate-shake">
                                 <AlertCircle size={20} />
                                 <p className="text-xs font-bold leading-tight uppercase tracking-tight">{error}</p>
                             </div>
@@ -285,7 +285,7 @@ export default function UploadPage() {
                             <button
                                 type="button"
                                 onClick={() => navigate('/documents')}
-                                className="w-full text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                                className="w-full text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-600 transition-colors"
                             >
                                 Descartar e Voltar
                             </button>
@@ -293,13 +293,13 @@ export default function UploadPage() {
                     </div>
 
                     {/* AI Info Card */}
-                    <div className="p-6 bg-slate-900 border border-slate-800 rounded-[1.5rem] shadow-inner">
+                    <div className="p-6 bg-primary-50 border border-primary-100 rounded-[1.5rem]">
                         <div className="flex items-start gap-4">
-                            <div className="p-2 bg-primary-500/20 rounded-xl">
-                                <Info size={20} className="text-primary-400" />
+                            <div className="p-2 bg-primary-100 rounded-xl">
+                                <Info size={20} className="text-primary-500" />
                             </div>
                             <div>
-                                <p className="text-xs font-black text-white uppercase tracking-widest">Motor OCR v3.1 Ativado</p>
+                                <p className="text-xs font-black text-slate-700 uppercase tracking-widest">Motor OCR v3.1 Ativado</p>
                                 <p className="text-[10px] text-slate-500 font-bold mt-2 uppercase leading-relaxed tracking-tight">
                                     A extração de metadados iniciará imediatamente após a conclusão do upload seguro.
                                 </p>

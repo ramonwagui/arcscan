@@ -30,8 +30,7 @@ export default function Layout() {
         : user?.email?.[0]?.toUpperCase() || 'U'
 
     return (
-        <div className="min-h-screen flex bg-slate-50 dark:bg-surface-950 transition-colors duration-500 font-sans selection:bg-primary-500/30">
-            {/* Sidebar overlay (mobile) */}
+        <div className="min-h-screen flex bg-slate-50 transition-colors duration-500 font-sans selection:bg-primary-500/30">
             {sidebarOpen && (
                 <div
                     className="fixed inset-0 bg-slate-900/60 z-40 lg:hidden backdrop-blur-md transition-opacity duration-300"
@@ -39,14 +38,12 @@ export default function Layout() {
                 />
             )}
 
-            {/* Sidebar */}
             <aside className={`
-                fixed top-0 left-0 h-full w-72 bg-white dark:bg-surface-900 border-r border-slate-200/60 dark:border-slate-800/40 z-50 flex flex-col
+                fixed top-0 left-0 h-full w-72 bg-white border-r border-slate-200/60 z-50 flex flex-col
                 transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)
                 ${sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
                 lg:translate-x-0 lg:static lg:z-auto
             `}>
-                {/* Brand Identity */}
                 <div className="px-8 py-10 flex items-center gap-4">
                     <div className="relative group">
                         <div className="relative w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center text-white shadow-md">
@@ -54,14 +51,13 @@ export default function Layout() {
                         </div>
                     </div>
                     <div>
-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white leading-none tracking-tighter">Arcscan</h1>
+                        <h1 className="text-2xl font-black text-slate-900 leading-none tracking-tighter">Arcscan</h1>
                         <p className="text-[10px] font-black text-primary-500 uppercase tracking-[0.3em] mt-1.5 opacity-80">Neural Engine</p>
                     </div>
                 </div>
 
-                {/* Primary Navigation */}
                 <nav className="flex-1 px-4 space-y-1.5 flex flex-col pt-2">
-                    <p className="px-5 mb-3 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Sistemas Centrais</p>
+                    <p className="px-5 mb-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sistemas Centrais</p>
                     {navItems.map(({ to, icon: Icon, label }) => (
                         <NavLink
                             key={to}
@@ -77,8 +73,8 @@ export default function Layout() {
                     ))}
 
                     {user?.role === 'superadmin' && (
-                        <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800/50">
-                            <p className="px-5 mb-3 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Nível de Comando</p>
+                        <div className="mt-8 pt-8 border-t border-slate-100">
+                            <p className="px-5 mb-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nível de Comando</p>
                             <NavLink
                                 to="/admin"
                                 onClick={() => setSidebarOpen(false)}
@@ -93,7 +89,6 @@ export default function Layout() {
                     )}
                 </nav>
 
-                {/* Secure Authentication Block */}
                 <div className="p-6 mt-auto">
                     <div className="p-4 rounded-xl bg-white border border-slate-100 shadow-sm group/profile">
                         <div className="flex items-center gap-3">
@@ -119,19 +114,16 @@ export default function Layout() {
                 </div>
             </aside>
 
-            {/* Main Application Interface */}
             <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-                {/* Neural Header (Glassmorphism) */}
-                <header className="h-20 lg:h-24 glass dark:bg-surface-950/60 border-b border-slate-200/50 dark:border-slate-800/30 flex items-center justify-between px-6 lg:px-12 sticky top-0 z-30 transition-all duration-300">
+                <header className="h-20 lg:h-24 glass border-b border-slate-200/50 flex items-center justify-between px-6 lg:px-12 sticky top-0 z-30 transition-all duration-300">
                     <div className="flex items-center gap-6 flex-1">
                         <button
                             onClick={() => setSidebarOpen(true)}
-                            className="lg:hidden w-11 h-11 rounded-xl bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center shadow-sm active:scale-90 transition-all"
+                            className="lg:hidden w-11 h-11 rounded-xl bg-white border border-slate-200 text-slate-600 flex items-center justify-center shadow-sm active:scale-90 transition-all"
                         >
                             <Menu size={22} />
                         </button>
 
-                        {/* Search Core Integration */}
                         <div className="hidden md:flex relative items-center max-w-lg w-full group">
                             <div className="absolute inset-0 bg-white border border-slate-200 rounded-full transition-all duration-300" />
                             <Search size={16} className="absolute left-4 text-slate-400 z-10" strokeWidth={2.5} />
@@ -145,21 +137,21 @@ export default function Layout() {
 
                     <div className="flex items-center gap-4 lg:gap-8">
                         <div className="flex items-center gap-2">
-                            <button className="w-11 h-11 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-800 transition-all relative flex items-center justify-center">
+                            <button className="w-11 h-11 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all relative flex items-center justify-center">
                                 <Bell size={20} />
-                                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary-500 rounded-full border-2 border-white dark:border-surface-950 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
+                                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary-500 rounded-full border-2 border-white shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
                             </button>
 
-                            <button className="hidden sm:flex w-11 h-11 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-surface-800 transition-all items-center justify-center">
+                            <button className="hidden sm:flex w-11 h-11 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all items-center justify-center">
                                 <Settings size={20} />
                             </button>
                         </div>
 
-                        <div className="h-10 w-px bg-slate-200/60 dark:bg-slate-800/40 hidden sm:block" />
+                        <div className="h-10 w-px bg-slate-200/60 hidden sm:block" />
 
                         <NavLink
                             to="/upload"
-                            className="h-12 px-6 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-950 text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-900/10 hover:translate-y-[-2px] active:translate-y-0 transition-all flex items-center gap-3"
+                            className="h-12 px-6 rounded-xl bg-primary-600 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-primary-600/20 hover:translate-y-[-2px] active:translate-y-0 transition-all flex items-center gap-3"
                         >
                             <Upload size={16} strokeWidth={3} />
                             <span className="hidden lg:block">Novo Registro</span>
@@ -168,7 +160,6 @@ export default function Layout() {
                     </div>
                 </header>
 
-                {/* Main Viewport */}
                 <main className="flex-1 overflow-y-auto custom-scrollbar bg-transparent">
                     <div className="p-6 lg:p-12">
                         <div className="max-w-[1400px] mx-auto">

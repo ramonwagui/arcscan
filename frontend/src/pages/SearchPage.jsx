@@ -12,21 +12,21 @@ function ResultCard({ doc, query }) {
 
     return (
         <Link to={`/documents/${doc.id}`} className="block group">
-            <div className="bg-white dark:bg-surface-900 border border-slate-100 dark:border-slate-800 rounded-[1.5rem] p-6 hover:border-primary-500/30 hover:shadow-xl hover:shadow-primary-500/5 transition-all duration-300">
+            <div className="bg-white border border-slate-100 rounded-[1.5rem] p-6 hover:border-primary-500/30 hover:shadow-xl hover:shadow-primary-500/5 transition-all duration-300">
                 <div className="flex items-start gap-5">
                     <div className="relative w-14 h-14 flex-shrink-0 group-hover:scale-105 transition-transform duration-500">
                         {doc.thumbnail_path ? (
                             <img
                                 src={`/mock-storage/${doc.thumbnail_path}`}
                                 alt=""
-                                className="w-14 h-14 rounded-2xl object-cover border border-slate-100 dark:border-slate-800 shadow-sm"
+                                className="w-14 h-14 rounded-2xl object-cover border border-slate-100 shadow-sm"
                             />
                         ) : (
-                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${cat.bg} ${cat.color} border border-white dark:border-surface-950 shadow-sm text-2xl`}>
+                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${cat.bg} ${cat.color} border border-white shadow-sm text-2xl`}>
                                 {cat.icon}
                             </div>
                         )}
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white dark:bg-surface-900 rounded-full flex items-center justify-center border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center border border-slate-100 shadow-sm">
                             <FileText size={10} className="text-slate-400" />
                         </div>
                     </div>
@@ -34,18 +34,18 @@ function ResultCard({ doc, query }) {
                     <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-3 mb-2">
                             <h3
-                                className="text-lg font-black text-slate-900 dark:text-white group-hover:text-primary-500 transition-colors tracking-tight"
+                                className="text-lg font-black text-slate-900 group-hover:text-primary-500 transition-colors tracking-tight"
                                 dangerouslySetInnerHTML={{ __html: highlightText(doc.title, query) }}
                             />
-                            <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest ${cat.bg} ${cat.color} border border-white dark:border-surface-950 shadow-sm`}>
+                            <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest ${cat.bg} ${cat.color} border border-white shadow-sm`}>
                                 {cat.label}
                             </span>
                         </div>
 
                         {snippet && (
-                            <div className="relative p-3 bg-slate-50 dark:bg-surface-950/50 rounded-xl border border-slate-100 dark:border-slate-800/60 mt-2">
+                            <div className="relative p-3 bg-slate-50 rounded-xl border border-slate-100 mt-2">
                                 <p
-                                    className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium line-clamp-2"
+                                    className="text-xs text-slate-500 leading-relaxed font-medium line-clamp-2"
                                     dangerouslySetInnerHTML={{ __html: highlightedSnippet }}
                                 />
                                 <div className="absolute top-2 right-2 opacity-20">
@@ -55,7 +55,7 @@ function ResultCard({ doc, query }) {
                         )}
 
                         <div className="flex items-center gap-4 mt-4">
-                            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-50 dark:bg-surface-800 border border-slate-100 dark:border-slate-700/50">
+                            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-50 border border-slate-100">
                                 <Clock size={10} className="text-slate-400" />
                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
                                     Auditado em {formatDate(doc.created_at)}
@@ -145,33 +145,33 @@ export default function SearchPage() {
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-[2.5rem] bg-primary-500/10 border border-primary-500/20 mb-8 shadow-inner group">
                     <Search size={32} className="text-primary-500 group-hover:scale-110 transition-transform duration-500" strokeWidth={2.5} />
                 </div>
-                <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-none mb-4">Busca Neural</h1>
+                <h1 className="text-5xl font-black text-slate-900 tracking-tight leading-none mb-4">Busca Neural</h1>
                 <p className="text-slate-500 font-bold text-xs uppercase tracking-[0.3em]">Exploração avançada de base de dados</p>
             </div>
 
             {/* Search Input Section */}
             <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-primary-500/20 to-blue-500/20 rounded-[2.5rem] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
-                <div className="relative bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-3 shadow-2xl dark:shadow-none flex flex-col md:flex-row items-stretch md:items-center gap-3">
+                <div className="relative bg-white border border-slate-200 rounded-[2rem] p-3 shadow-2xl flex flex-col md:flex-row items-stretch md:items-center gap-3">
                     <div className="relative flex-1">
                         <Search size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" strokeWidth={2.5} />
                         <input
                             ref={inputRef}
                             type="text"
-                            className="w-full bg-transparent border-none focus:ring-0 pl-16 pr-12 py-5 text-xl font-bold text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700"
+                            className="w-full bg-transparent border-none focus:ring-0 pl-16 pr-12 py-5 text-xl font-bold text-slate-800 placeholder:text-slate-300"
                             placeholder="Descreva o que você procura..."
                             value={query}
                             onChange={e => setQuery(e.target.value)}
                             onKeyDown={handleKey}
                         />
                         {query && (
-                            <button onClick={clearSearch} className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-100 dark:bg-surface-800 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                            <button onClick={clearSearch} className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
                                 <X size={14} strokeWidth={3} />
                             </button>
                         )}
                     </div>
 
-                    <div className="h-10 w-[2px] bg-slate-100 dark:bg-slate-800 hidden md:block" />
+                    <div className="h-10 w-[2px] bg-slate-100 hidden md:block" />
 
                     <div className="flex items-center gap-2 pl-2">
                         <button
@@ -179,7 +179,7 @@ export default function SearchPage() {
                             className={`h-14 px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border flex items-center gap-2
                                 ${showFilters || hasFilters
                                     ? 'bg-primary-500/10 border-primary-500/30 text-primary-500 shadow-sm'
-                                    : 'bg-transparent border-transparent text-slate-400 hover:bg-slate-50 dark:hover:bg-surface-800'
+                                    : 'bg-transparent border-transparent text-slate-400 hover:bg-slate-50'
                                 }`}
                         >
                             <Filter size={16} strokeWidth={2.5} />
@@ -199,11 +199,11 @@ export default function SearchPage() {
 
                 {/* Expanded Filters */}
                 {showFilters && (
-                    <div className="absolute top-full left-0 right-0 mt-4 p-8 bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] shadow-2xl z-30 animate-slide-up grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="absolute top-full left-0 right-0 mt-4 p-8 bg-white border border-slate-200 rounded-[2.5rem] shadow-2xl z-30 animate-slide-up grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div>
                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 block">Segmento Especial</label>
                             <select
-                                className="w-full h-12 bg-slate-50 dark:bg-surface-950 border border-slate-100 dark:border-slate-800 rounded-xl px-4 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:border-primary-500"
+                                className="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl px-4 text-xs font-bold text-slate-700 outline-none focus:border-primary-500"
                                 value={filters.category}
                                 onChange={e => setFilters(f => ({ ...f, category: e.target.value }))}
                             >
@@ -215,7 +215,7 @@ export default function SearchPage() {
                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 block">Período Inicial</label>
                             <input
                                 type="date"
-                                className="w-full h-12 bg-slate-50 dark:bg-surface-950 border border-slate-100 dark:border-slate-800 rounded-xl px-4 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:border-primary-500"
+                                className="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl px-4 text-xs font-bold text-slate-700 outline-none focus:border-primary-500"
                                 value={filters.dateFrom}
                                 onChange={e => setFilters(f => ({ ...f, dateFrom: e.target.value }))}
                             />
@@ -225,7 +225,7 @@ export default function SearchPage() {
                             <div className="flex gap-2">
                                 <input
                                     type="date"
-                                    className="flex-1 h-12 bg-slate-50 dark:bg-surface-950 border border-slate-100 dark:border-slate-800 rounded-xl px-4 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:border-primary-500"
+                                    className="flex-1 h-12 bg-slate-50 border border-slate-100 rounded-xl px-4 text-xs font-bold text-slate-700 outline-none focus:border-primary-500"
                                     value={filters.dateTo}
                                     onChange={e => setFilters(f => ({ ...f, dateTo: e.target.value }))}
                                 />
@@ -257,7 +257,7 @@ export default function SearchPage() {
                                     <button
                                         key={ex}
                                         onClick={() => { setQuery(ex); performSearch(ex) }}
-                                        className="px-5 py-3 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 hover:border-primary-500 hover:text-primary-500 hover:shadow-lg transition-all"
+                                        className="px-5 py-3 rounded-2xl text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:border-primary-500 hover:text-primary-500 hover:shadow-lg transition-all"
                                     >
                                         "{ex}"
                                     </button>
@@ -267,12 +267,12 @@ export default function SearchPage() {
                     </div>
 
                     <div className="md:col-span-4">
-                        <div className="p-8 bg-slate-900 rounded-[2.5rem] border border-white/5 space-y-6">
+                        <div className="p-8 bg-primary-50 rounded-[2.5rem] border border-primary-100 space-y-6">
                             <div className="w-12 h-12 rounded-2xl bg-primary-500 flex items-center justify-center text-white shadow-xl shadow-primary-500/20">
                                 <Cpu size={24} />
                             </div>
                             <div>
-                                <h4 className="text-white font-black uppercase tracking-widest text-sm mb-2">Motor Neural v3.0</h4>
+                                <h4 className="text-slate-700 font-black uppercase tracking-widest text-sm mb-2">Motor Neural v3.0</h4>
                                 <p className="text-[10px] font-bold text-slate-500 leading-relaxed uppercase tracking-tight">
                                     Otimizada para extração semântica em documentos escaneados e PDF nativos. Precisão superior a 99% em OCR.
                                 </p>
@@ -282,7 +282,7 @@ export default function SearchPage() {
                                 className={`w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all
                                     ${semanticSearch
                                         ? 'bg-primary-500 text-white border-primary-400 shadow-lg shadow-primary-500/20'
-                                        : 'bg-white/5 border-white/10 text-slate-400'}`}
+                                        : 'bg-white border-slate-200 text-slate-500'}`}
                             >
                                 Busca Semântica: {semanticSearch ? 'Otimizada' : 'Padrão'}
                             </button>
@@ -296,11 +296,11 @@ export default function SearchPage() {
                 <div className="space-y-6 animate-fade-in">
                     {loading ? (
                         <div className="space-y-4 pt-10">
-                            {[...Array(3)].map((_, i) => <div key={i} className="h-32 bg-slate-100 dark:bg-surface-900 rounded-[2rem] animate-pulse" />)}
+                            {[...Array(3)].map((_, i) => <div key={i} className="h-32 bg-slate-100 rounded-[2rem] animate-pulse" />)}
                         </div>
                     ) : results && results.length === 0 ? (
-                        <div className="text-center py-32 bg-slate-50 dark:bg-surface-950/40 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-800">
-                            <div className="w-20 h-20 rounded-[2rem] bg-slate-100 dark:bg-surface-900 flex items-center justify-center mx-auto mb-6 text-slate-300">
+                        <div className="text-center py-32 bg-slate-50 rounded-[3rem] border border-dashed border-slate-200">
+                            <div className="w-20 h-20 rounded-[2rem] bg-slate-100 flex items-center justify-center mx-auto mb-6 text-slate-300">
                                 <Search size={32} strokeWidth={1} />
                             </div>
                             <h3 className="text-xl font-black text-slate-400 uppercase tracking-tight">Nenhum Registro Localizado</h3>
@@ -314,7 +314,7 @@ export default function SearchPage() {
                                         {results?.length} Encontrados
                                     </div>
                                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                                        Resultados para <span className="text-slate-900 dark:text-white">"{query}"</span>
+                                        Resultados para <span className="text-slate-900">"{query}"</span>
                                     </p>
                                 </div>
                             </div>
