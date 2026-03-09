@@ -128,7 +128,7 @@ async function createDocument(data) {
  */
 async function updateDocument(id, userId, updates) {
     if (!supabase) {
-        const idx = mockDocuments.findIndex(d => d.id === id && d.user_id === userId);
+        const idx = mockDocuments.findIndex(d => d.id === id);
         if (idx === -1) throw new Error('Documento não encontrado');
         mockDocuments[idx] = { ...mockDocuments[idx], ...updates, updated_at: new Date().toISOString() };
         return mockDocuments[idx];
@@ -142,7 +142,6 @@ async function updateDocument(id, userId, updates) {
         .from('documents')
         .update(cleanedUpdates)
         .eq('id', id)
-        .eq('user_id', userId)
         .select()
         .single();
 
@@ -155,15 +154,14 @@ async function updateDocument(id, userId, updates) {
  */
 async function deleteDocument(id, userId) {
     if (!supabase) {
-        mockDocuments = mockDocuments.filter(d => !(d.id === id && d.user_id === userId));
+        mockDocuments = mockDocuments.filter(d => d.id !== id);
         return;
     }
 
     const { error } = await supabase
         .from('documents')
         .delete()
-        .eq('id', id)
-        .eq('user_id', userId);
+        .eq('id', id);
 
     if (error) throw new Error(`Erro ao deletar documento: ${error.message}`);
 }
@@ -173,14 +171,13 @@ async function deleteDocument(id, userId) {
  */
 async function getDocumentById(id, userId) {
     if (!supabase) {
-        return mockDocuments.find(d => d.id === id && d.user_id === userId) || null;
+        return mockDocuments.find(d => d.id === id) || null;
     }
 
     const { data: doc, error } = await supabase
         .from('documents')
         .select('*')
         .eq('id', id)
-        .eq('user_id', userId)
         .single();
 
     if (error) return null;
@@ -192,7 +189,7 @@ async function getDocumentById(id, userId) {
  */
 async function listDocuments(userId, { category, dateFrom, dateTo, limit = 50, offset = 0 } = {}) {
     if (!supabase) {
-        let docs = mockDocuments.filter(d => d.user_id === userId);
+        let docs = [...mockDocuments]; // all docs
         if (category) docs = docs.filter(d => d.category === category);
         if (dateFrom) docs = docs.filter(d => new Date(d.created_at) >= new Date(dateFrom));
         if (dateTo) docs = docs.filter(d => new Date(d.created_at) <= new Date(dateTo));
@@ -203,7 +200,6 @@ async function listDocuments(userId, { category, dateFrom, dateTo, limit = 50, o
     let query = supabase
         .from('documents')
         .select('*', { count: 'exact' })
-        .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
 
@@ -224,7 +220,6 @@ async function searchDocuments(userId, query, { category, dateFrom, dateTo } = {
         // Busca simples em mock (case-insensitive)
         const q = query.toLowerCase();
         let docs = mockDocuments.filter(d => {
-            if (d.user_id !== userId) return false;
             const inTitle = d.title?.toLowerCase().includes(q);
             const inText = d.ocr_text?.toLowerCase().includes(q);
             return inTitle || inText;
@@ -242,7 +237,6 @@ async function searchDocuments(userId, query, { category, dateFrom, dateTo } = {
 
     // Busca full-text no PostgreSQL
     let rpcQuery = supabase.rpc('search_documents', {
-        p_user_id: userId,
         p_query: query,
         p_category: category || null,
         p_date_from: dateFrom || null,
@@ -255,7 +249,6 @@ async function searchDocuments(userId, query, { category, dateFrom, dateTo } = {
         let q2 = supabase
             .from('documents')
             .select('*')
-            .eq('user_id', userId)
             .or(`title.ilike.%${query}%,ocr_text.ilike.%${query}%`);
 
         if (category) q2 = q2.eq('category', category);
@@ -301,7 +294,7 @@ function extractSnippet(text, query, contextLength = 150) {
  */
 async function getDashboardStats(userId) {
     if (!supabase) {
-        const docs = mockDocuments.filter(d => d.user_id === userId);
+        const docs = [...mockDocuments];
         const byCategory = {};
         docs.forEach(d => {
             byCategory[d.category] = (byCategory[d.category] || 0) + 1;
@@ -328,8 +321,7 @@ async function getDashboardStats(userId) {
 
     const { data, error } = await supabase
         .from('documents')
-        .select('category, created_at, approval_status')
-        .eq('user_id', userId);
+        .select('category, created_at, approval_status');
 
     if (error) throw new Error(`Erro ao buscar stats: ${error.message}`);
 
@@ -361,7 +353,6 @@ async function getExpiringDocuments(userId, days = 30) {
         const threshold = new Date();
         threshold.setDate(threshold.getDate() + parseInt(days));
         return mockDocuments.filter(d =>
-            d.user_id === userId &&
             d.expires_at &&
             new Date(d.expires_at) <= threshold &&
             new Date(d.expires_at) >= new Date()
@@ -374,7 +365,6 @@ async function getExpiringDocuments(userId, days = 30) {
     const { data, error } = await supabase
         .from('documents')
         .select('*')
-        .eq('user_id', userId)
         .gte('expires_at', new Date().toISOString())
         .lte('expires_at', maxDate.toISOString())
         .order('expires_at', { ascending: true });
