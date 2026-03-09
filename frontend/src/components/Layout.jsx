@@ -30,7 +30,7 @@ export default function Layout() {
         : user?.email?.[0]?.toUpperCase() || 'U'
 
     return (
-        <div className="min-h-screen flex bg-white dark:bg-white transition-colors duration-500 font-sans selection:bg-primary-500/30">
+        <div className="min-h-screen flex bg-slate-50 dark:bg-surface-950 transition-colors duration-500 font-sans selection:bg-primary-500/30">
             {/* Sidebar overlay (mobile) */}
             {sidebarOpen && (
                 <div
@@ -49,9 +49,8 @@ export default function Layout() {
                 {/* Brand Identity */}
                 <div className="px-8 py-10 flex items-center gap-4">
                     <div className="relative group">
-                        <div className="absolute -inset-1.5 bg-gradient-to-tr from-primary-600 to-blue-400 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-500" />
-                        <div className="relative w-12 h-12 rounded-2xl bg-primary-500 flex items-center justify-center text-white shadow-xl shadow-primary-500/20">
-                            <Search size={24} strokeWidth={3} className="group-hover:scale-110 transition-transform duration-500" />
+                        <div className="relative w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center text-white shadow-md">
+                            <Search size={20} strokeWidth={2.5} className="group-hover:scale-110 transition-transform duration-500" />
                         </div>
                     </div>
                     <div>
@@ -96,20 +95,17 @@ export default function Layout() {
 
                 {/* Secure Authentication Block */}
                 <div className="p-6 mt-auto">
-                    <div className="p-4 rounded-[1.5rem] bg-slate-50 dark:bg-surface-950 border border-slate-100 dark:border-slate-800/60 shadow-inner group/profile">
+                    <div className="p-4 rounded-xl bg-white border border-slate-100 shadow-sm group/profile">
                         <div className="flex items-center gap-3">
                             <div className="relative">
-                                <div className="absolute -inset-1 bg-primary-500 rounded-full blur-[2px] opacity-0 group-hover/profile:opacity-20 transition-opacity" />
-                                <div className="relative w-10 h-10 rounded-xl bg-white dark:bg-surface-800 text-primary-500 flex items-center justify-center font-black border border-slate-200 dark:border-slate-700 text-xs shadow-sm">
-                                    {initials}
+                                <div className="absolute -inset-1 bg-amber-500 rounded-full blur-[2px] opacity-0 group-hover/profile:opacity-20 transition-opacity" />
+                                <div className="relative w-10 h-10 rounded-full bg-amber-300 text-white flex items-center justify-center font-black border-2 border-white shadow-sm">
+                                    <User size={20} className="fill-white/20" />
                                 </div>
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-[11px] font-black text-slate-900 dark:text-white truncate uppercase tracking-tighter">{user?.name || 'Administrador'}</p>
-                                <div className="flex items-center gap-1 mt-0.5">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{user?.role === 'superadmin' ? 'Acesso Total' : 'Operador'}</p>
-                                </div>
+                                <p className="text-[12px] font-bold text-slate-900 truncate">{user?.name || 'Admin User'}</p>
+                                <p className="text-[10px] text-slate-500">{user?.role === 'superadmin' ? 'Premium Account' : 'Standard'}</p>
                             </div>
                         </div>
                         <button
@@ -137,16 +133,13 @@ export default function Layout() {
 
                         {/* Search Core Integration */}
                         <div className="hidden md:flex relative items-center max-w-lg w-full group">
-                            <div className="absolute inset-0 bg-slate-100 dark:bg-surface-900 group-focus-within:bg-white dark:group-focus-within:bg-surface-800 rounded-2xl transition-all duration-300" />
-                            <Search size={16} className="absolute left-5 text-slate-400 group-focus-within:text-primary-500 transition-colors z-10" strokeWidth={2.5} />
+                            <div className="absolute inset-0 bg-white border border-slate-200 rounded-full transition-all duration-300" />
+                            <Search size={16} className="absolute left-4 text-slate-400 z-10" strokeWidth={2.5} />
                             <input
                                 type="text"
-                                className="relative w-full bg-transparent border-none focus:ring-0 py-3 pl-14 pr-4 text-xs font-bold text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 z-10"
-                                placeholder="Consultar base de dados, registros ou auditorias..."
+                                className="relative w-full bg-transparent border-none focus:ring-0 py-2.5 pl-11 pr-4 text-xs text-slate-700 placeholder:text-slate-400 z-10"
+                                placeholder="Search analytics..."
                             />
-                            <div className="absolute right-4 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 text-[9px] font-black text-slate-300 tracking-tighter z-10 cursor-default">
-                                ⌘K
-                            </div>
                         </div>
                     </div>
 

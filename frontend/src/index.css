@@ -13,12 +13,12 @@
   }
 
   body {
-    @apply bg-white text-slate-900 font-sans antialiased transition-colors duration-300;
+    @apply bg-slate-50 text-slate-900 font-sans antialiased transition-colors duration-300;
     min-height: 100vh;
   }
 
   body.dark {
-    @apply bg-white text-slate-900;
+    @apply bg-surface-900 text-slate-100;
   }
 
   ::-webkit-scrollbar {
@@ -85,7 +85,7 @@
   }
 
   .sidebar-link.active {
-    @apply bg-primary-500 text-white shadow-lg shadow-primary-500/25 border-none;
+    @apply bg-primary-50 text-primary-700 font-bold;
   }
 }
 

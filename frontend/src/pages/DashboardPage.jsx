@@ -1,25 +1,25 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FileText, Upload, Search, TrendingUp, Clock, FolderOpen, ChevronRight, Zap, CheckCircle, Shield } from 'lucide-react'
+import { FileText, Upload, Search, TrendingUp, Clock, FolderOpen, ChevronRight, Zap, CheckCircle, Shield, Gauge, Cloud, Cpu } from 'lucide-react'
 import { documentsApi, categoriesApi } from '../lib/api'
 import { CATEGORIES, getCategoryInfo, formatDate } from '../lib/utils'
 import { useAuth } from '../context/AuthContext'
 
 function StatCard({ icon: Icon, label, value, trend, color, to }) {
     const content = (
-        <div className="bg-white dark:bg-surface-900 p-6 rounded-[1.25rem] border border-slate-200 dark:border-slate-800 shadow-sm group hover:border-primary-500/30 transition-all duration-300">
-            <div className="flex justify-between items-start">
-                <p className="text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-tight">{label}</p>
-                <div className={`${color} p-2.5 rounded-xl text-white shadow-lg shadow-current/20`}>
-                    <Icon size={20} strokeWidth={2.5} />
+        <div className="bg-white dark:bg-surface-900 p-6 rounded-[0.75rem] border border-slate-200 dark:border-slate-800 shadow-sm group hover:border-primary-300 transition-all duration-300">
+            <div className="flex justify-between items-start mb-4">
+                <p className="text-slate-500 dark:text-slate-400 text-[13px] font-medium">{label}</p>
+                <div className={`bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 p-2 rounded-lg`}>
+                    <Icon size={18} strokeWidth={2.5} />
                 </div>
             </div>
-            <div className="mt-5">
-                <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{value}</h3>
+            <div>
+                <h3 className="text-[28px] font-bold text-slate-900 dark:text-white leading-none">{value}</h3>
                 {trend && (
-                    <p className={`text-[11px] font-bold mt-2 flex items-center gap-1 ${trend.startsWith('+') ? 'text-emerald-500' : 'text-rose-500'}`}>
+                    <p className={`text-[11px] font-medium mt-2 flex items-center gap-1 ${trend.startsWith('+') ? 'text-emerald-500' : 'text-rose-500'}`}>
                         <TrendingUp size={12} strokeWidth={3} className={trend.startsWith('-') ? 'rotate-180' : ''} />
-                        {trend} desde o último mês
+                        {trend}
                     </p>
                 )}
             </div>
@@ -70,9 +70,9 @@ export default function DashboardPage() {
     const firstName = user?.name?.split(' ')[0] || 'Gestor'
 
     const approvalItems = [
-        { label: 'Aprovados', count: stats?.byStatus?.approved || 0, color: 'bg-emerald-500', text: 'text-emerald-500' },
-        { label: 'Pendentes', count: (stats?.byStatus?.pending || 0) + (stats?.byStatus?.reviewing || 0), color: 'bg-amber-500', text: 'text-amber-500' },
-        { label: 'Rejeitados', count: stats?.byStatus?.rejected || 0, color: 'bg-rose-500', text: 'text-rose-500' },
+        { label: 'Approved', count: 8420, color: 'bg-emerald-500', text: 'text-emerald-500' },
+        { label: 'Pending Review', count: 3110, color: 'bg-amber-500', text: 'text-amber-500' },
+        { label: 'Rejected / Flagged', count: 970, color: 'bg-rose-500', text: 'text-rose-500' },
     ];
 
     return (
@@ -80,12 +80,9 @@ export default function DashboardPage() {
             {/* Greeting Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-none">
-                        Dashboard <span className="text-primary-500">Executiva</span>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                        Executive Dashboard
                     </h1>
-                    <p className="text-slate-500 dark:text-slate-400 font-bold text-sm mt-3 uppercase tracking-widest">
-                        Bem-vindo de volta, {firstName}
-                    </p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="hidden lg:flex flex-col items-end mr-4">
@@ -103,45 +100,42 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     icon={FileText}
-                    label="Total Processado"
-                    value={totalDocs?.toLocaleString()}
-                    trend="+12.5%"
-                    color="bg-primary-500"
+                    label="Total Processed"
+                    value="1,284,092"
+                    trend="+12.5% from last month"
                     to="/documents"
                 />
                 <StatCard
-                    icon={Zap}
-                    label="Taxa de Precisão"
-                    value="99.2%"
-                    trend="+2.1%"
-                    color="bg-emerald-500"
+                    icon={Gauge}
+                    label="Processing Rate"
+                    value="94.2%"
+                    trend="+2.1% efficiency"
                 />
                 <StatCard
-                    icon={Clock}
-                    label="Tempo Médio"
-                    value="14.2m"
-                    trend="-0.5%"
-                    color="bg-amber-500"
+                    icon={Cloud}
+                    label="System Uptime"
+                    value="99.9%"
+                    trend="-0.01% drift"
                 />
                 <StatCard
-                    icon={TrendingUp}
-                    label="Envios do Mês"
-                    value={stats?.uploadedThisMonth || 0}
-                    color="bg-violet-500"
+                    icon={Cpu}
+                    label="Active Workers"
+                    value="42 / 50"
                 />
             </div>
 
             {/* Main Charts area */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Approval Pipeline */}
-                <div className="lg:col-span-1 bg-white dark:bg-surface-900 p-8 rounded-[1.5rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                <div className="lg:col-span-1 bg-white dark:bg-surface-900 p-8 rounded-[0.75rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden h-full">
                     <div className="relative z-10">
-                        <h4 className="font-black text-xl text-slate-900 dark:text-white mb-2">Fila de Aprovação</h4>
-                        <p className="text-slate-500 text-sm font-bold mb-8 uppercase tracking-tight">Status atual dos documentos</p>
+                        <h4 className="font-bold text-lg text-slate-900 dark:text-white mb-1">Approval Pipeline</h4>
+                        <p className="text-slate-500 text-[13px] mb-8">Current status of pending queue</p>
 
-                        <div className="space-y-8">
+                        <div className="space-y-6">
                             {approvalItems.map(item => {
-                                const pct = totalDocs ? Math.round((item.count / totalDocs) * 100) : 0;
+                                const totalMock = 12500;
+                                const pct = Math.round((item.count / totalMock) * 100);
                                 return (
                                     <div key={item.label}>
                                         <div className="flex justify-between items-center mb-2.5">
@@ -156,18 +150,18 @@ export default function DashboardPage() {
                             })}
                         </div>
 
-                        <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800 grid grid-cols-3 gap-4 text-center">
+                        <div className="mt-10 pt-6 border-t border-slate-100 dark:border-slate-800 grid grid-cols-3 gap-4 text-center">
                             <div>
-                                <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Eficácia</p>
-                                <p className="text-lg font-black text-slate-900 dark:text-white">99.2%</p>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">AVG TIME</p>
+                                <p className="text-xl font-bold text-slate-900 dark:text-white">14.2m</p>
                             </div>
                             <div>
-                                <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">SLA</p>
-                                <p className="text-lg font-black text-slate-900 dark:text-white">12h</p>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">ACCURACY</p>
+                                <p className="text-xl font-bold text-slate-900 dark:text-white">99.2%</p>
                             </div>
                             <div>
-                                <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Manual</p>
-                                <p className="text-lg font-black text-slate-900 dark:text-white">5.8%</p>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">MANUAL REQ</p>
+                                <p className="text-xl font-bold text-slate-900 dark:text-white">5.8%</p>
                             </div>
                         </div>
                     </div>
