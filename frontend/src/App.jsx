@@ -1,14 +1,29 @@
+import { Suspense, lazy } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Layout from './components/Layout'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import DashboardPage from './pages/DashboardPage'
-import DocumentsPage from './pages/DocumentsPage'
-import SearchPage from './pages/SearchPage'
-import UploadPage from './pages/UploadPage'
-import DocumentDetailPage from './pages/DocumentDetailPage'
-import AdminPage from './pages/AdminPage'
+
+const suspended = (Component) => (props) => (
+    <Suspense fallback={
+        <div className="min-h-[50vh] flex items-center justify-center w-full">
+            <div className="flex flex-col items-center gap-4">
+                <div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-primary-500 animate-spin" />
+                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Carregando módulo...</p>
+            </div>
+        </div>
+    }>
+        <Component {...props} />
+    </Suspense>
+)
+
+const LoginPage = suspended(lazy(() => import('./pages/LoginPage')))
+const RegisterPage = suspended(lazy(() => import('./pages/RegisterPage')))
+const DashboardPage = suspended(lazy(() => import('./pages/DashboardPage')))
+const DocumentsPage = suspended(lazy(() => import('./pages/DocumentsPage')))
+const SearchPage = suspended(lazy(() => import('./pages/SearchPage')))
+const UploadPage = suspended(lazy(() => import('./pages/UploadPage')))
+const DocumentDetailPage = suspended(lazy(() => import('./pages/DocumentDetailPage')))
+const AdminPage = suspended(lazy(() => import('./pages/AdminPage')))
 
 function PrivateRoute({ children }) {
     const { user, loading } = useAuth()
