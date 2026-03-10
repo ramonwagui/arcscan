@@ -15,6 +15,7 @@ const {
     getExpiringDocuments,
 } = require('../services/documentService');
 const aiService = require('../services/aiService');
+const notificationService = require('../services/notificationService');
 
 const VALID_CATEGORIES = ['contratos', 'notas_fiscais', 'oficios', 'convenios', 'projetos', 'prontuarios', 'outros'];
 
@@ -262,13 +263,13 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
         });
         docId = doc.id;
 
-        await auditService.log(req.user.id, 'UPLOAD', docId, { filename: doc.filename }, req.user.email, req.ip);
-
-        // Retornar imediatamente ao cliente
         res.status(201).json({
             message: 'Documento enviado. OCR em processamento...',
             document: doc,
         });
+
+        // Trigger real-time notification
+        notificationService.notifyUpload(req.user.id, doc.filename, docId).catch(() => { });
 
         // 3. OCR em background (não bloqueia a resposta)
         (async () => {
@@ -287,6 +288,10 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
                     embedding: embedding,
                     status: 'completed',
                 });
+
+                // OCR Finished Notification
+                notificationService.notifyOCR(req.user.id, doc.title, docId).catch(() => { });
+
                 console.log(`[OCR/IA] Documento ${docId} processado e vetorizado.`);
             } catch (ocrErr) {
                 console.error(`[OCR] Erro no documento ${docId}:`, ocrErr.message);

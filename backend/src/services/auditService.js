@@ -33,6 +33,9 @@ class AuditService {
      * Registra uma ação com IP real
      */
     async log(userId, action, resourceId, details = {}, userName = null, ip = '127.0.0.1') {
+        let cleanIp = ip ? ip.replace('::ffff:', '') : '127.0.0.1';
+        if (cleanIp === '::1') cleanIp = '127.0.0.1 (Localhost)';
+
         const entry = {
             id: uuidv4(),
             timestamp: new Date().toISOString(),
@@ -41,7 +44,7 @@ class AuditService {
             action,
             resource_id: resourceId,
             details,
-            ip: ip.replace('::ffff:', '') // Limpeza básica de IPv6 para IPv4
+            ip: cleanIp
         };
 
         if (!supabase) {

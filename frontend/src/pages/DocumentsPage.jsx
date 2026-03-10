@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { FileText, Filter, Search, Trash2, Eye, ChevronRight, SlidersHorizontal, X, Upload, Clock } from 'lucide-react'
+import { FileText, Filter, Search, Trash2, Eye, ChevronRight, SlidersHorizontal, X, Upload, Clock, FolderOpen, ArrowLeft } from 'lucide-react'
 import { documentsApi, categoriesApi } from '../lib/api'
 import { CATEGORIES, getCategoryInfo, formatDate, formatFileSize, getFileIcon } from '../lib/utils'
 import toast from 'react-hot-toast'
@@ -27,11 +27,11 @@ function DocumentCard({ doc, onDelete, dbCategories }) {
     return (
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-primary-500/30 hover:shadow-md transition-all duration-300 group flex flex-col md:flex-row items-center gap-6">
             {/* Thumbnail/Icon */}
-            <div className={`w-20 h-20 md:w-24 md:h-24 rounded-2xl flex-shrink-0 flex items-center justify-center text-3xl ${cat.bg} border-2 border-white shadow-sm overflow-hidden relative group-hover:scale-105 transition-transform duration-500`}>
+            <div className={`w-20 h-20 md:w-24 md:h-24 rounded-2xl flex-shrink-0 flex items-center justify-center ${cat.bg} border-2 border-white shadow-sm overflow-hidden relative group-hover:scale-105 transition-transform duration-500`}>
                 {doc.thumbnail_path ? (
                     <img src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/documents/${doc.thumbnail_path}`} alt="" className="w-full h-full object-cover" />
                 ) : (
-                    <span className="relative z-10">{cat.icon}</span>
+                    <FileText size={36} strokeWidth={1.5} className={`relative z-10 ${cat.color}`} />
                 )}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
             </div>
@@ -92,6 +92,42 @@ function DocumentCard({ doc, onDelete, dbCategories }) {
     )
 }
 
+function CategoryFolder({ group, onDelete, dbCategories }) {
+    const [isOpen, setIsOpen] = useState(true)
+
+    return (
+        <div className="bg-slate-50/50 rounded-[2rem] border border-slate-200/80 overflow-hidden transition-all duration-300 shadow-sm">
+            <div
+                className="flex items-center justify-between p-5 md:px-8 cursor-pointer hover:bg-slate-100 transition-colors select-none"
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                <div className="flex items-center gap-5">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl ${group.info.bg} ${group.info.color} shadow-sm border-2 border-white`}>
+                        {isOpen ? '📂' : (group.info.icon || '📁')}
+                    </div>
+                    <div className="flex-1">
+                        <h2 className="text-xl font-black text-slate-800 tracking-tight">{group.info.label}</h2>
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
+                            {group.documents.length} {group.documents.length === 1 ? 'documento' : 'documentos'}
+                        </p>
+                    </div>
+                </div>
+                <div className={`p-2 rounded-full text-slate-400 bg-white border border-slate-200 shadow-sm transition-transform duration-300 ${isOpen ? 'rotate-90 bg-primary-50 text-primary-600 border-primary-100' : ''}`}>
+                    <ChevronRight size={20} strokeWidth={3} />
+                </div>
+            </div>
+
+            {isOpen && (
+                <div className="p-6 md:p-8 grid grid-cols-1 gap-5 lg:grid-cols-2 bg-white/50 border-t border-slate-200/60">
+                    {group.documents.map(doc => (
+                        <DocumentCard key={doc.id} doc={doc} onDelete={onDelete} dbCategories={dbCategories} />
+                    ))}
+                </div>
+            )}
+        </div>
+    )
+}
+
 export default function DocumentsPage() {
     const [docs, setDocs] = useState([])
     const [total, setTotal] = useState(0)
@@ -99,6 +135,7 @@ export default function DocumentsPage() {
     const [showFilters, setShowFilters] = useState(false)
     const [filters, setFilters] = useState({ category: '', dateFrom: '', dateTo: '', search: '' })
     const [dbCategories, setDbCategories] = useState([])
+    const [selectedCategory, setSelectedCategory] = useState(null)
 
     useEffect(() => {
         categoriesApi.list().then(setDbCategories).catch(() => { })
@@ -128,6 +165,21 @@ export default function DocumentsPage() {
     const handleDelete = (id) => setDocs(prev => prev.filter(d => d.id !== id))
     const clearFilters = () => setFilters({ category: '', dateFrom: '', dateTo: '', search: '' })
     const hasFilters = filters.category || filters.dateFrom || filters.dateTo || filters.search
+
+    const categoriesMap = new Map()
+    docs.forEach(doc => {
+        const catInfo = getCategoryInfo(doc.category, dbCategories)
+        const catKey = catInfo.value || catInfo.slug || 'outros'
+        if (!categoriesMap.has(catKey)) {
+            categoriesMap.set(catKey, { info: catInfo, documents: [] })
+        }
+        categoriesMap.get(catKey).documents.push(doc)
+    })
+    const groupedDocs = Array.from(categoriesMap.values()).sort((a, b) => a.info.label.localeCompare(b.info.label))
+
+    // Handle view based on selection
+    const viewDocuments = selectedCategory ? (categoriesMap.get(selectedCategory)?.documents || []) : []
+    const viewGroupInfo = selectedCategory ? categoriesMap.get(selectedCategory)?.info : null
 
     return (
         <div className="space-y-10 animate-slide-up pb-10">
@@ -246,10 +298,70 @@ export default function DocumentsPage() {
                     )}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-5">
-                    {docs.map(doc => (
-                        <DocumentCard key={doc.id} doc={doc} onDelete={handleDelete} dbCategories={dbCategories} />
-                    ))}
+                <div className="space-y-6">
+                    {!selectedCategory ? (
+                        /* BREADCRUMB / VIEW TITLE */
+                        <>
+                            <div className="flex items-center gap-2 mb-2 text-slate-500 font-medium">
+                                <FolderOpen size={18} />
+                                <span>Meu Arquivo</span>
+                                <ChevronRight size={16} />
+                                <span className="text-slate-400">Categorias</span>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                {groupedDocs.map(group => {
+                                    const gk = group.info.value || group.info.slug;
+                                    return (
+                                        <div
+                                            key={gk}
+                                            onClick={() => setSelectedCategory(gk)}
+                                            className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-primary-500/30 hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col group items-start gap-4"
+                                        >
+                                            <div className={`w-16 h-16 rounded-2xl flex flex-shrink-0 items-center justify-center text-4xl ${group.info.bg} ${group.info.color} border-2 border-white shadow-sm overflow-hidden relative group-hover:scale-105 transition-transform duration-500`}>
+                                                <span className="relative z-10">{group.info.icon || '📁'}</span>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-black text-slate-900 tracking-tight group-hover:text-primary-500 transition-colors">{group.info.label}</h3>
+                                                <p className="text-sm font-medium text-slate-500 mt-1">
+                                                    {group.documents.length} {group.documents.length === 1 ? 'arquivo' : 'arquivos'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </>
+                    ) : (
+                        /* INSIDE FOLDER VIEW */
+                        <div className="animate-fade-in space-y-6">
+                            <div className="flex items-center gap-4 border-b border-slate-200/60 pb-4 mb-4">
+                                <button
+                                    onClick={() => setSelectedCategory(null)}
+                                    className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors flex items-center justify-center"
+                                    title="Voltar às categorias"
+                                >
+                                    <ArrowLeft size={20} />
+                                </button>
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${viewGroupInfo.bg} ${viewGroupInfo.color}`}>
+                                    {viewGroupInfo.icon || '📁'}
+                                </div>
+                                <h2 className="text-2xl font-black text-slate-800 tracking-tight">{viewGroupInfo.label}</h2>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                                {viewDocuments.length > 0 ? (
+                                    viewDocuments.map(doc => (
+                                        <DocumentCard key={doc.id} doc={doc} onDelete={handleDelete} dbCategories={dbCategories} />
+                                    ))
+                                ) : (
+                                    <div className="col-span-full py-16 text-center text-slate-400">
+                                        Nenhum arquivo encontrado nesta pasta.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

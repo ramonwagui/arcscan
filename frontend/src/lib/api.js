@@ -2,10 +2,15 @@ import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
 
-// Instância padrão do axios
 const api = axios.create({
     baseURL: API_URL,
     timeout: 60000, // 60s para OCR
+})
+
+// Instância pública para não redirecionar em caso de erro 401/403 de links expirados
+export const publicApi = axios.create({
+    baseURL: API_URL,
+    timeout: 60000,
 })
 
 // Interceptor de request: adiciona Authorization header
@@ -17,14 +22,21 @@ api.interceptors.request.use((config) => {
     return config
 })
 
+import { supabase } from './supabase'
+
 // Interceptor de response: trata erros globais
 api.interceptors.response.use(
     (response) => response,
-    (error) => {
+    async (error) => {
         if (error.response?.status === 401) {
             localStorage.removeItem('docsearch_token')
             localStorage.removeItem('docsearch_user')
-            window.location.href = '/login'
+            if (supabase) {
+                await supabase.auth.signOut().catch(() => { })
+            }
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login'
+            }
         }
         return Promise.reject(error)
     }
@@ -72,6 +84,44 @@ export const documentsApi = {
 
     extractFields: (id) =>
         api.post(`/api/documents/${id}/extract-fields`).then(r => r.data),
+}
+
+// ──────────────────────────────────────────
+// Signatures
+// ──────────────────────────────────────────
+
+export const signaturesApi = {
+    request: (documentId, emails) =>
+        api.post('/api/signatures/request', { documentId, emails }).then(r => r.data),
+
+    getPublicPayload: (token) =>
+        publicApi.get(`/api/signatures/public/${token}`).then(r => r.data),
+
+    finalize: (token, auditData) =>
+        publicApi.post(`/api/signatures/public/${token}/complete`, { auditData }).then(r => r.data)
+}
+
+// ──────────────────────────────────────────
+// Document Requests (Solicitação de Envio)
+// ──────────────────────────────────────────
+
+export const docRequestsApi = {
+    list: () =>
+        api.get('/api/doc-requests').then(r => r.data),
+
+    create: (data) =>
+        api.post('/api/doc-requests', data).then(r => r.data),
+
+    getPublic: (token) =>
+        publicApi.get(`/api/doc-requests/public/${token}`).then(r => r.data),
+
+    publicUpload: (token, formData, onProgress) =>
+        publicApi.post(`/api/doc-requests/public/${token}/upload`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            onUploadProgress: (e) => {
+                if (onProgress) onProgress(Math.round((e.loaded * 100) / e.total))
+            },
+        }).then(r => r.data)
 }
 
 // ──────────────────────────────────────────

@@ -70,9 +70,9 @@ export default function DashboardPage() {
     const firstName = user?.name?.split(' ')[0] || 'Gestor'
 
     const approvalItems = [
-        { label: 'Approved', count: 8420, color: 'bg-emerald-500', text: 'text-emerald-500' },
-        { label: 'Pending Review', count: 3110, color: 'bg-amber-500', text: 'text-amber-500' },
-        { label: 'Rejected / Flagged', count: 970, color: 'bg-rose-500', text: 'text-rose-500' },
+        { label: 'Aprovados', count: stats?.byStatus?.approved || 0, color: 'bg-emerald-500', text: 'text-emerald-500', status: 'approved' },
+        { label: 'Em Revisão', count: (stats?.byStatus?.pending || 0) + (stats?.byStatus?.reviewing || 0), color: 'bg-amber-500', text: 'text-amber-500', status: 'pending' },
+        { label: 'Rejeitados', count: stats?.byStatus?.rejected || 0, color: 'bg-rose-500', text: 'text-rose-500', status: 'rejected' },
     ];
 
     return (
@@ -81,13 +81,14 @@ export default function DashboardPage() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900">
-                        Executive Dashboard
+                        Olá, {firstName}
                     </h1>
+                    <p className="text-slate-500 font-medium">Bem-vindo ao seu painel executivo do Arcscan.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="hidden lg:flex flex-col items-end mr-4">
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Última Atualização</p>
-                        <p className="text-xs font-bold text-slate-700">Há poucos segundos</p>
+                        <p className="text-xs font-bold text-slate-700">Sincronizado via Supabase</p>
                     </div>
                     <Link to="/upload" className="btn-primary">
                         <Zap size={18} fill="currentColor" />
@@ -100,27 +101,25 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     icon={FileText}
-                    label="Total Processed"
-                    value="1,284,092"
-                    trend="+12.5% from last month"
+                    label="Total de Documentos"
+                    value={totalDocs.toLocaleString()}
                     to="/documents"
                 />
                 <StatCard
                     icon={Gauge}
-                    label="Processing Rate"
-                    value="94.2%"
-                    trend="+2.1% efficiency"
+                    label="Subidos este Mês"
+                    value={stats?.uploadedThisMonth || 0}
+                    trend={stats?.uploadedThisMonth > 0 ? `+${stats.uploadedThisMonth}` : null}
                 />
                 <StatCard
-                    icon={Cloud}
-                    label="System Uptime"
-                    value="99.9%"
-                    trend="-0.01% drift"
+                    icon={CheckCircle}
+                    label="Taxa de Aprovação"
+                    value={totalDocs > 0 ? `${Math.round(((stats?.byStatus?.approved || 0) / totalDocs) * 100)}%` : '0%'}
                 />
                 <StatCard
                     icon={Cpu}
-                    label="Active Workers"
-                    value="42 / 50"
+                    label="Categorias em Uso"
+                    value={Object.keys(stats?.byCategory || {}).length}
                 />
             </div>
 
@@ -129,13 +128,12 @@ export default function DashboardPage() {
                 {/* Approval Pipeline */}
                 <div className="lg:col-span-1 bg-white p-8 rounded-[0.75rem] border border-slate-200 shadow-sm relative overflow-hidden h-full">
                     <div className="relative z-10">
-                        <h4 className="font-bold text-lg text-slate-900 mb-1">Approval Pipeline</h4>
-                        <p className="text-slate-500 text-[13px] mb-8">Current status of pending queue</p>
+                        <h4 className="font-bold text-lg text-slate-900 mb-1">Status de Aprovação</h4>
+                        <p className="text-slate-500 text-[13px] mb-8">Fluxo de revisão de documentos</p>
 
                         <div className="space-y-6">
                             {approvalItems.map(item => {
-                                const totalMock = 12500;
-                                const pct = Math.round((item.count / totalMock) * 100);
+                                const pct = totalDocs > 0 ? Math.round((item.count / totalDocs) * 100) : 0;
                                 return (
                                     <div key={item.label}>
                                         <div className="flex justify-between items-center mb-2.5">
@@ -152,16 +150,16 @@ export default function DashboardPage() {
 
                         <div className="mt-10 pt-6 border-t border-slate-100 grid grid-cols-3 gap-4 text-center">
                             <div>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">AVG TIME</p>
-                                <p className="text-xl font-bold text-slate-900">14.2m</p>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">TOTAL</p>
+                                <p className="text-xl font-bold text-slate-900">{totalDocs}</p>
                             </div>
                             <div>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">ACCURACY</p>
-                                <p className="text-xl font-bold text-slate-900">99.2%</p>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">RECENTES</p>
+                                <p className="text-xl font-bold text-slate-900">{recentDocs.length}</p>
                             </div>
                             <div>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">MANUAL REQ</p>
-                                <p className="text-xl font-bold text-slate-900">5.8%</p>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">EXPIRANDO</p>
+                                <p className="text-xl font-bold text-slate-900 text-rose-500">{expiringDocs.length}</p>
                             </div>
                         </div>
                     </div>
@@ -171,7 +169,7 @@ export default function DashboardPage() {
                 <div className="lg:col-span-2 bg-white p-8 rounded-[1.5rem] border border-slate-200 shadow-sm">
                     <div className="flex items-center justify-between mb-8">
                         <div>
-                            <h4 className="font-black text-xl text-slate-900">Capas Recentes</h4>
+                            <h4 className="font-black text-xl text-slate-900">Documentos Recentes</h4>
                             <p className="text-slate-500 text-sm font-bold uppercase tracking-tight">Últimas entradas no sistema</p>
                         </div>
                         <Link to="/documents" className="text-primary-500 text-xs font-black uppercase tracking-widest hover:underline flex items-center gap-1">
@@ -197,7 +195,9 @@ export default function DashboardPage() {
                                         <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl ${cat.bg} border border-white shadow-sm transition-transform group-hover:scale-105`}>
                                             {doc.thumbnail_path ? (
                                                 <img src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/documents/${doc.thumbnail_path}`} alt="" className="w-full h-full object-cover rounded-xl" />
-                                            ) : cat.icon}
+                                            ) : (
+                                                <FileText size={24} className={cat.color} />
+                                            )}
                                         </div>
                                         <div className="flex-1 min-w-0 flex flex-col justify-center">
                                             <p className="text-sm font-black text-slate-900 truncate group-hover:text-primary-500 transition-colors uppercase tracking-tight">{doc.title}</p>

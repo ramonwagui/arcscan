@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import {
     LayoutDashboard, FileText, Search, Upload, LogOut,
-    Menu, X, Bell, Shield, Settings, User
+    Menu, X, Bell, Shield, Settings, User, Send, Trash2, CheckCircle2, Clock, Sparkles
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { useNotifications } from '../context/NotificationContext'
+import { formatDate } from '../lib/utils'
 import toast from 'react-hot-toast'
 
 const navItems = [
@@ -12,12 +14,15 @@ const navItems = [
     { to: '/documents', icon: FileText, label: 'Documentos' },
     { to: '/search', icon: Search, label: 'Busca' },
     { to: '/upload', icon: Upload, label: 'Upload' },
+    { to: '/requests', icon: Send, label: 'Solicitações' },
 ]
 
 export default function Layout() {
     const { user, signOut, isMockMode } = useAuth()
+    const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications()
     const navigate = useNavigate()
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [notificationsOpen, setNotificationsOpen] = useState(false)
 
     const handleSignOut = async () => {
         await signOut()
@@ -133,10 +138,89 @@ export default function Layout() {
 
                     <div className="flex items-center gap-4 lg:gap-8">
                         <div className="flex items-center gap-2">
-                            <button className="w-11 h-11 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all relative flex items-center justify-center">
-                                <Bell size={20} />
-                                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary-500 rounded-full border-2 border-white shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
-                            </button>
+                            <div className="relative">
+                                <button
+                                    onClick={() => setNotificationsOpen(!notificationsOpen)}
+                                    className={`w-11 h-11 rounded-xl transition-all relative flex items-center justify-center ${notificationsOpen ? 'bg-primary-50 text-primary-500 shadow-inner' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'}`}
+                                >
+                                    <Bell size={20} strokeWidth={2.5} />
+                                    {unreadCount > 0 && (
+                                        <span className="absolute top-2.5 right-2.5 w-4 h-4 bg-rose-500 text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white animate-bounce-short shadow-sm">
+                                            {unreadCount > 9 ? '+9' : unreadCount}
+                                        </span>
+                                    )}
+                                </button>
+
+                                {notificationsOpen && (
+                                    <>
+                                        <div
+                                            className="fixed inset-0 z-40 bg-transparent"
+                                            onClick={() => setNotificationsOpen(false)}
+                                        />
+                                        <div className="absolute right-0 mt-3 w-80 lg:w-96 bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden z-50 animate-slide-down">
+                                            <div className="p-5 border-b border-slate-50 flex items-center justify-between">
+                                                <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Atividade Recente</h3>
+                                                {unreadCount > 0 && (
+                                                    <button
+                                                        onClick={markAllAsRead}
+                                                        className="text-[10px] font-black text-primary-500 uppercase hover:text-primary-600 transition-colors"
+                                                    >
+                                                        Marcar lidas
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar text-left font-sans">
+                                                {notifications.length === 0 ? (
+                                                    <div className="p-10 text-center">
+                                                        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                                                            <Bell size={20} className="text-slate-300" />
+                                                        </div>
+                                                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-tight">Tudo em dia!</p>
+                                                    </div>
+                                                ) : (
+                                                    notifications.map(notif => (
+                                                        <div
+                                                            key={notif.id}
+                                                            onClick={() => {
+                                                                markAsRead(notif.id)
+                                                                if (notif.link) navigate(notif.link)
+                                                                setNotificationsOpen(false)
+                                                            }}
+                                                            className={`p-4 border-b border-slate-50 last:border-0 hover:bg-slate-50 cursor-pointer transition-colors flex gap-4 ${!notif.read ? 'bg-primary-50/30' : ''}`}
+                                                        >
+                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${notif.type === 'upload' ? 'bg-blue-100 text-blue-500' :
+                                                                notif.type === 'ocr' ? 'bg-emerald-100 text-emerald-500' :
+                                                                    'bg-amber-100 text-amber-500'
+                                                                }`}>
+                                                                {notif.type === 'upload' ? <Upload size={18} /> :
+                                                                    notif.type === 'ocr' ? <Sparkles size={18} /> :
+                                                                        <Shield size={18} />}
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className={`text-xs ${!notif.read ? 'font-black text-slate-900' : 'font-medium text-slate-600'}`}>
+                                                                    {notif.message}
+                                                                </p>
+                                                                <div className="flex items-center gap-2 mt-1.5 opacity-60">
+                                                                    <Clock size={10} />
+                                                                    <span className="text-[9px] font-black uppercase tracking-tight">{formatDate(notif.created_at)}</span>
+                                                                </div>
+                                                            </div>
+                                                            {!notif.read && (
+                                                                <div className="w-2 h-2 rounded-full bg-primary-500 mt-1" />
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
+                                            {notifications.length > 0 && (
+                                                <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
+                                                    <button className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600">Ver Histórico Completo</button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
 
                             <button className="hidden sm:flex w-11 h-11 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all items-center justify-center">
                                 <Settings size={20} />

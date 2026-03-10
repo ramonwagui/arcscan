@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { NotificationProvider } from './context/NotificationContext'
 import Layout from './components/Layout'
 
 const suspended = (Component) => (props) => (
@@ -24,6 +25,9 @@ const SearchPage = suspended(lazy(() => import('./pages/SearchPage')))
 const UploadPage = suspended(lazy(() => import('./pages/UploadPage')))
 const DocumentDetailPage = suspended(lazy(() => import('./pages/DocumentDetailPage')))
 const AdminPage = suspended(lazy(() => import('./pages/AdminPage')))
+const PublicSignPage = suspended(lazy(() => import('./pages/PublicSignPage')))
+const PublicUploadPage = suspended(lazy(() => import('./pages/PublicUploadPage')))
+const RequestsPage = suspended(lazy(() => import('./pages/RequestsPage')))
 
 function PrivateRoute({ children }) {
     const { user, loading } = useAuth()
@@ -51,23 +55,27 @@ function PublicRoute({ children }) {
 export default function App() {
     return (
         <AuthProvider>
-            <Routes>
-                {/* Rotas públicas */}
-                <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+            <NotificationProvider>
+                <Routes>
+                    <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+                    <Route path="/sign/:token" element={<PublicSignPage />} />
+                    <Route path="/upload/:token" element={<PublicUploadPage />} />
 
-                {/* Rotas privadas */}
-                <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
-                    <Route index element={<Navigate to="/dashboard" replace />} />
-                    <Route path="dashboard" element={<DashboardPage />} />
-                    <Route path="documents" element={<DocumentsPage />} />
-                    <Route path="documents/:id" element={<DocumentDetailPage />} />
-                    <Route path="search" element={<SearchPage />} />
-                    <Route path="upload" element={<UploadPage />} />
-                    <Route path="admin" element={<AdminPage />} />
-                </Route>
+                    {/* Rotas privadas */}
+                    <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
+                        <Route index element={<Navigate to="/dashboard" replace />} />
+                        <Route path="dashboard" element={<DashboardPage />} />
+                        <Route path="documents" element={<DocumentsPage />} />
+                        <Route path="documents/:id" element={<DocumentDetailPage />} />
+                        <Route path="search" element={<SearchPage />} />
+                        <Route path="upload" element={<UploadPage />} />
+                        <Route path="requests" element={<RequestsPage />} />
+                        <Route path="admin" element={<AdminPage />} />
+                    </Route>
 
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
+                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
+            </NotificationProvider>
         </AuthProvider>
     )
 }

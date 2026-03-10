@@ -10,6 +10,8 @@ const searchRouter = require('./routes/search');
 const healthRouter = require('./routes/health');
 const categoriesRouter = require('./routes/categories');
 const usersRouter = require('./routes/users');
+const signaturesRouter = require('./routes/signatures');
+const docRequestsRouter = require('./routes/docRequests');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -35,7 +37,7 @@ app.use(cors({
 // Rate limit
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
-  max: 200,
+  max: process.env.NODE_ENV === 'development' ? 5000 : 200,
   message: { error: 'Muitas requisições. Tente novamente mais tarde.' }
 });
 app.use(limiter);
@@ -55,6 +57,8 @@ app.use('/api/documents', documentsRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/signatures', signaturesRouter);
+app.use('/api/doc-requests', docRequestsRouter);
 
 // 404
 app.use((req, res) => {
