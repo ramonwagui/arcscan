@@ -1,6 +1,13 @@
 import axios from 'axios'
 
-const API_URL = import.meta.env.VITE_API_URL || '/api'
+// Detecta se estamos rodando em produção ou desenvolvimento
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+
+// Em produção, SEMPRE usamos o caminho relativo /api (que a Vercel redireciona)
+// Em local, usamos a variável VITE_API_URL ou o padrão 3001
+const API_URL = isLocal
+    ? (import.meta.env.VITE_API_URL || 'http://localhost:3001')
+    : '/api'
 
 const api = axios.create({
     baseURL: API_URL,

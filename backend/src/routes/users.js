@@ -167,7 +167,13 @@ router.delete('/:id', async (req, res, next) => {
         // A chave já está sendo usada como SUPABASE_SERVICE_KEY, que tem permissões de Admin
         const { error } = await supabase.auth.admin.deleteUser(req.params.id);
 
-        if (error) throw error;
+        if (error) {
+            console.error('❌ Erro Supabase Admin Delete:', error);
+            return res.status(error.status || 500).json({
+                error: error.message || 'Falha ao remover usuário no Supabase',
+                details: error
+            });
+        }
         res.json({ message: 'Usuário removido com sucesso' });
     } catch (err) {
         next(err);
