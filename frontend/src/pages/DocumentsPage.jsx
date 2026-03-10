@@ -167,15 +167,28 @@ export default function DocumentsPage() {
     const hasFilters = filters.category || filters.dateFrom || filters.dateTo || filters.search
 
     const categoriesMap = new Map()
+
+    // Inicia o mapa com todas as categorias reais do banco (para que apareçam mesmo vazias)
+    dbCategories.forEach(cat => {
+        const catInfo = getCategoryInfo(cat.slug, dbCategories)
+        categoriesMap.set(cat.slug, { info: catInfo, documents: [] })
+    })
+
+    // Distribui os documentos nas categorias
     docs.forEach(doc => {
         const catInfo = getCategoryInfo(doc.category, dbCategories)
         const catKey = catInfo.value || catInfo.slug || 'outros'
+
         if (!categoriesMap.has(catKey)) {
+            // Fallback para categorias que não existem no banco mas possuem arquivos
             categoriesMap.set(catKey, { info: catInfo, documents: [] })
         }
         categoriesMap.get(catKey).documents.push(doc)
     })
-    const groupedDocs = Array.from(categoriesMap.values()).sort((a, b) => a.info.label.localeCompare(b.info.label))
+
+    const groupedDocs = Array.from(categoriesMap.values()).sort((a, b) =>
+        (a.info.label || '').localeCompare(b.info.label || '')
+    )
 
     // Handle view based on selection
     const viewDocuments = selectedCategory ? (categoriesMap.get(selectedCategory)?.documents || []) : []
