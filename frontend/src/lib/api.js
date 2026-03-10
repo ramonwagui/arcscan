@@ -3,11 +3,11 @@ import axios from 'axios'
 // Detecta se estamos rodando em produção ou desenvolvimento
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
 
-// Em produção, SEMPRE usamos o caminho relativo /api (que a Vercel redireciona)
-// Em local, usamos a variável VITE_API_URL ou o padrão 3001
+// Em produção, as rotas já começam com /api, então o baseURL deve ser vazio
+// Em local, usamos o endereço completo do backend
 const API_URL = isLocal
     ? (import.meta.env.VITE_API_URL || 'http://localhost:3001')
-    : '/api'
+    : ''
 
 const api = axios.create({
     baseURL: API_URL,
