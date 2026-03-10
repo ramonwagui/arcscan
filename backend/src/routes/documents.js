@@ -17,7 +17,7 @@ const {
 const aiService = require('../services/aiService');
 const notificationService = require('../services/notificationService');
 
-const VALID_CATEGORIES = ['contratos', 'notas_fiscais', 'oficios', 'convenios', 'projetos', 'prontuarios', 'outros'];
+// VALID_CATEGORIES removida para usar validação dinâmica via banco de dados
 
 // Todas as rotas requerem autenticação
 router.use(authMiddleware);
@@ -57,8 +57,11 @@ router.get('/', async (req, res, next) => {
     try {
         const { category, dateFrom, dateTo, limit = 50, offset = 0 } = req.query;
 
-        if (category && !VALID_CATEGORIES.includes(category)) {
-            return res.status(400).json({ error: 'Categoria inválida' });
+        if (category) {
+            const { data: catExists } = await supabase.from('categories').select('slug').eq('slug', category).single();
+            if (!catExists && category !== 'outros') {
+                return res.status(400).json({ error: `Categoria '${category}' não existe no banco de dados.` });
+            }
         }
 
         const result = await listDocuments(req.user.id, {
@@ -171,8 +174,11 @@ router.patch('/:id/status', async (req, res, next) => {
             reviewed_at: new Date().toISOString()
         };
 
-        if (category && VALID_CATEGORIES.includes(category)) {
-            updates.category = category;
+        if (category) {
+            const { data: catExists } = await supabase.from('categories').select('slug').eq('slug', category).single();
+            if (catExists || category === 'outros') {
+                updates.category = category;
+            }
         }
 
         const updatedDoc = await updateDocument(req.params.id, req.user.id, updates);
@@ -221,8 +227,10 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
             return res.status(400).json({ error: 'Título é obrigatório (mínimo 2 caracteres)' });
         }
 
-        if (!VALID_CATEGORIES.includes(category)) {
-            return res.status(400).json({ error: 'Categoria inválida' });
+        // Validação dinâmica da categoria
+        const { data: catExists } = await supabase.from('categories').select('slug').eq('slug', category).single();
+        if (!catExists && category !== 'outros') {
+            return res.status(400).json({ error: `A categoria '${category}' selecionada não existe no sistema.` });
         }
 
         // 1. Fazer upload do arquivo
